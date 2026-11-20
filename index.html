@@ -618,13 +618,13 @@ function tok(k,side,show,extra=''){
 
 /* ---------- som ---------- */
 let soundOn=store.get('cb_sound')!==false,AC=null,lastFlag=false;
-const VOLDEF={music:.4,shot:1,boom:1,step:1,fanfare:1,mortar:1};
+const VOLDEF={music:.4,amb:.6,shot:1,boom:1,step:1,fanfare:1,mortar:1};
 const VOL={...VOLDEF,...(store.get('cb_vol')||{})};const BUS={};
 function bus(c){if(!BUS[c]){BUS[c]=AC.createGain();BUS[c].connect(AC.destination)}BUS[c].gain.value=VOL[c];return BUS[c]}
 function ensureAudio(){
   if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
   if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});
-  const m=$('bgm');if(AC&&!ensureAudio.src){try{ensureAudio.src=AC.createMediaElementSource(m);ensureAudio.src.connect(bus('music'));m.volume=1}catch(e){}}if(!ensureAudio.src)m.volume=VOL.music;if(soundOn&&m.paused)m.play().catch(()=>{});
+  const m=$('bgm');if(AC&&!ensureAudio.src){try{ensureAudio.src=AC.createMediaElementSource(m);ensureAudio.src.connect(bus('music'));m.volume=1}catch(e){}}if(AC){loadSounds();ambStart()}if(!ensureAudio.src)m.volume=VOL.music;if(soundOn&&m.paused)m.play().catch(()=>{});
 }
 document.addEventListener('pointerdown',ensureAudio,{capture:true});
 document.addEventListener('visibilitychange',()=>{const m=$('bgm');if(document.hidden)m.pause();else if(soundOn&&AC)m.play().catch(()=>{})});
@@ -681,11 +681,41 @@ function sfxWhistle(dur){
 }
 function setMusicVol(v){if(ensureAudio.src&&BUS.music){BUS.music.gain.cancelScheduledValues(AC.currentTime);BUS.music.gain.setTargetAtTime(v,AC.currentTime,.05)}else $('bgm').volume=Math.min(1,v)}
 function duck(ms){setMusicVol(VOL.music*.25);clearTimeout(duck.t);duck.t=setTimeout(()=>setMusicVol(VOL.music),ms)}
+/* ---------- sons gravados (pasta Effects do usuário) ---------- */
+const SND={};const SFILES=['tiro','metralhadora','explosao','estrondo','morteiro','canhao1','canhao2','canhao3','canhao4','amb_batalha','amb_tanque','amb_aviao'];
+let sndLoading=false;
+function loadSounds(){if(sndLoading||!AC)return;sndLoading=true;
+  for(const n of SFILES)fetch(`som/${n}.mp3`).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,er)=>AC.decodeAudioData(b,ok,er))).then(buf=>SND[n]=buf).catch(()=>{});}
+function play(n,cat,o={}){
+  if(!soundOn||!AC||!SND[n])return null;const t=AC.currentTime+(o.at||0);
+  const src=AC.createBufferSource();src.buffer=SND[n];src.playbackRate.value=o.rate||1;
+  const g=AC.createGain();g.gain.value=o.vol??1;let node=src;
+  if(o.lp){const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=o.lp;node.connect(f);node=f}
+  if(AC.createStereoPanner&&o.pan!=null){const p=AC.createStereoPanner();p.pan.value=o.pan;node.connect(p);node=p}
+  node.connect(g).connect(bus(cat));
+  if(o.fadeIn){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(o.vol??1,t+o.fadeIn)}
+  const off=o.offset||0,dur=o.dur||(SND[n].duration-off);
+  if(o.fadeOut){g.gain.setValueAtTime(o.vol??1,t+Math.max(.01,dur-o.fadeOut));g.gain.exponentialRampToValueAtTime(.0001,t+dur)}
+  src.start(t,off,dur);return src;
+}
+const has=n=>!!SND[n];
+// ambiente: sons que entram e saem e depois voltam
+const AMB=[{n:'amb_aviao',vol:.55,fade:5,gap:[25,60]},{n:'amb_batalha',vol:.5,fade:4,gap:[15,40]},{n:'amb_tanque',vol:.4,fade:1.2,gap:[30,70]},
+  {n:'metralhadora',vol:.18,lp:1400,gap:[20,50]},{n:'canhao1',vol:.25,lp:900,gap:[18,45]},{n:'canhao3',vol:.22,lp:800,gap:[22,55]}];
+let ambOn=false;
+function ambStart(){if(ambOn)return;ambOn=true;
+  for(const a of AMB){const loop=()=>{const [x,y]=a.gap;a.t=setTimeout(()=>{
+      if(soundOn&&!document.hidden&&has(a.n)){const len=SND[a.n].duration,dur=a.fade?Math.min(len,8+Math.random()*(len-8)):len,off=a.fade?Math.random()*Math.max(0,len-dur):0;
+        play(a.n,'amb',{vol:a.vol*(.7+Math.random()*.5),pan:(Math.random()*2-1)*.8,lp:a.lp,fadeIn:a.fade,fadeOut:a.fade,offset:off,dur,rate:.92+Math.random()*.16})}
+      loop()},(x+Math.random()*(y-x))*1000)};
+    setTimeout(loop,Math.random()*8000)}}
 function sfxClash(ev){
   lastFlag=!!ev.flag;
-  if(ev.flag)sfxFanfare(ev.a.side==='p');
-  else if(ev.d.k==='B'&&ev.res==='d')sfxBoom();
-  else if(ev.d.k==='B')sfxShot(0,.5);
+  if(ev.flag){play('tiro','shot',{vol:.7});sfxFanfare(ev.a.side==='p')}
+  else if(ev.d.k==='B'&&ev.res==='d'){if(has('explosao')){play('explosao','boom');duck(2500)}else sfxBoom()}
+  else if(ev.d.k==='B'){has('tiro')?play('tiro','shot',{vol:.5,rate:1.1}):sfxShot(0,.5)}
+  else if(has('tiro')){const big=+ev.a.k>=8||+ev.d.k>=8;
+    if(big&&has('metralhadora'))play('metralhadora','shot',{dur:1.6,fadeOut:.4,vol:.9});else play('tiro','shot',{rate:.95+Math.random()*.1});}
   else{sfxShot(0);sfxShot(.14,.75)}
 }
 
@@ -805,7 +835,7 @@ async function fireMortar(fr,fc,tr,tc){
   const m=board[fr][fc],t=board[tr][tc],side=m.side,mine=side==='p';
   const [x0,y0]=cellXY(fr,fc),[x1,y1]=cellXY(tr,tc),g=$('grid');
   board[fr][fc]=null;dead[side].push('M');last=[fr*10+fc,tr*10+tc];render();
-  const dur=950,peak=Math.max(90,Math.abs(y1-y0)*.6+70);sfxWhistle(dur/1000);
+  const dur=950,peak=Math.max(90,Math.abs(y1-y0)*.6+70);if(has('morteiro'))play('morteiro','mortar');else sfxWhistle(dur/1000);
   const sh=document.createElement('div');sh.className='shell';g.appendChild(sh);
   await new Promise(res=>{const t0=performance.now();let lt=0;(function f(now){const p=Math.min(1,(now-t0)/dur),x=x0+(x1-x0)*p,y=y0+(y1-y0)*p-Math.sin(Math.PI*p)*peak;
     sh.style.left=x+'px';sh.style.top=y+'px';sh.style.transform=`scale(${1+Math.sin(Math.PI*p)*.8})`;
@@ -815,7 +845,7 @@ async function fireMortar(fr,fc,tr,tc){
   // revela a carta atingida por um instante
   const cell=g.querySelector(`[data-i="${tr*10+tc}"]`);
   if(cell)cell.innerHTML=tok(t.k,t.side,true,'pop');
-  mortarBoom();
+  if(has('explosao')){play('explosao','mortar',{vol:1});play('estrondo','mortar',{vol:.5,at:.15});duck(2500)}else mortarBoom();
   const fl=document.createElement('div');fl.className='flashfull';document.body.appendChild(fl);setTimeout(()=>fl.remove(),500);
   for(const [cls,ms] of [['blast',800],['blast b2',1000],['smokeball',1600],['ring',700]]){const e=document.createElement('div');e.className=cls;e.style.left=x1+'px';e.style.top=y1+'px';g.appendChild(e);setTimeout(()=>e.remove(),ms)}
   for(let i=0;i<26;i++){const d=document.createElement('div');d.className='debris';d.style.left=x1+'px';d.style.top=y1+'px';g.appendChild(d);
@@ -984,7 +1014,7 @@ function killBar(side,el){
   el.innerHTML=`<span class="kl"><i style="background:${fl}"></i>${side==='a'?'Inimigo':'Suas'}</span><span class="kr">${KS.map(k=>{const n=lc[k]||0,all=n>=INITC[k];
     return `<span class="kp${all?' dead':''}" style="background-image:url(${cardSrc(k,side)||IMG(k,side)});background-position:${(pos[k]||'50% 5%/190% auto').split('/')[0]};background-size:${(pos[k]||'50% 5%/190% auto').split('/')[1]}">${n?`<em>${n}</em>`:''}<b>${k}</b></span>`}).join('')}</span>`;
 }
-const MIX=[['music','Música'],['step','Passos de marcha'],['shot','Tiros (confronto)'],['boom','Explosão (granada)'],['mortar','Morteiro'],['fanfare','Vitória / derrota']];
+const MIX=[['music','Música'],['amb','Ambiente de guerra'],['step','Passos de marcha'],['shot','Tiros (confronto)'],['boom','Explosão (granada)'],['mortar','Morteiro'],['fanfare','Vitória / derrota']];
 function soundSheet(){
   sheet(`<h3>Som</h3><button class="btn ${soundOn?'':'ghost'}" data-act="sound" style="width:100%">${soundOn?'Som ligado':'Som desligado'}</button>
   <div class="mix">${MIX.map(([k,n])=>`<label class="mx"><span>${n}<em id="mv_${k}">${Math.round(VOL[k]*100)}%</em></span><input type="range" min="0" max="${k==='music'?100:150}" value="${Math.round(VOL[k]*100)}" data-vol="${k}"></label>`).join('')}</div>
@@ -993,7 +1023,7 @@ function soundSheet(){
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k)return;VOL[k]=e.target.value/100;store.set('cb_vol',VOL);
   $('mv_'+k).textContent=e.target.value+'%';if(k==='music')setMusicVol(VOL.music);else if(BUS[k])BUS[k].gain.value=VOL[k]});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k||!soundOn)return;ensureAudio();
-  ({step:sfxStep,shot:()=>{sfxShot(0);sfxShot(.14,.75)},boom:sfxBoom,mortar:()=>{sfxWhistle(.8);setTimeout(()=>mortarBoom(),800)},fanfare:()=>sfxFanfare(true)})[k]?.()});
+  ({amb:()=>play('amb_aviao','amb',{dur:4,fadeIn:.8,fadeOut:1.5}),step:sfxStep,shot:()=>has('tiro')?play('tiro','shot'):sfxShot(0),boom:()=>has('explosao')?play('explosao','boom'):sfxBoom(),mortar:()=>{if(has('morteiro')){play('morteiro','mortar');play('explosao','mortar',{at:1})}else{sfxWhistle(.8);setTimeout(()=>mortarBoom(),800)}},fanfare:()=>sfxFanfare(true)})[k]?.()});
 function natSheet(){
   sheet(`<h3>Escolha seu exército</h3><div class="natgrid">${Object.keys(NATIONS).map(k=>`<button data-nat="${k}" class="${k===NAT?'cur':''}" aria-label="${NATIONS[k].n}"><img src="nac/${k}.webp" alt=""></button>`).join('')}</div><button class="btn ghost" data-act="close" style="width:100%;margin-top:14px">Fechar</button>`);
 }
