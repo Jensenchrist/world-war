@@ -417,12 +417,12 @@ body.desk #bonus{order:0;width:auto}
 .bon{flex:none;min-height:46px;border:0;padding:0 10px;display:flex;align-items:center;gap:6px;font:700 14px Oswald,sans-serif;text-transform:uppercase;color:#1d1405;cursor:pointer;
  background:linear-gradient(#f3d27e,#a8772a);clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px);animation:pulse 1.2s ease-in-out infinite}
 .bon svg{width:24px;height:24px}
-.plane{position:absolute;z-index:40;width:calc(var(--cw)*4.2);aspect-ratio:200/160;margin:calc(var(--cw)*-1.68) 0 0 calc(var(--cw)*-2.1);transform:rotate(calc(90deg + var(--bank,0deg)));filter:drop-shadow(0 2px 2px rgba(0,0,0,.7)) saturate(.9);pointer-events:none}
+.plane{position:absolute;z-index:40;width:calc(var(--cw)*4.2);aspect-ratio:520/372;margin:calc(var(--cw)*-1.5) 0 0 calc(var(--cw)*-2.1);transform:rotate(calc(90deg + var(--bank,0deg)));filter:drop-shadow(0 2px 2px rgba(0,0,0,.7)) saturate(.9);pointer-events:none}
 .plane.en{transform:rotate(calc(-90deg + var(--bank,0deg)))}
-.plane svg,.planeshadow svg{width:100%;height:100%;display:block}
+.plane img,.planeshadow img{width:100%;height:100%;display:block}
 .plane .blades{animation:spin .07s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.planeshadow{position:absolute;z-index:39;width:calc(var(--cw)*3.8);aspect-ratio:200/160;margin:calc(var(--cw)*-1.52) 0 0 calc(var(--cw)*-1.9);transform:rotate(90deg);filter:brightness(0) blur(3px);opacity:.38;pointer-events:none}
+.planeshadow{position:absolute;z-index:39;width:calc(var(--cw)*3.8);aspect-ratio:520/372;margin:calc(var(--cw)*-1.36) 0 0 calc(var(--cw)*-1.9);transform:rotate(90deg);filter:brightness(0) blur(3px);opacity:.38;pointer-events:none}
 .planeshadow.en{transform:rotate(-90deg)}
 .exhaust{position:absolute;z-index:38;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:rgba(220,215,200,.35);pointer-events:none;animation:smoke .9s ease-out forwards}
 .bomb{position:absolute;z-index:41;width:calc(var(--cw)*.28);height:calc(var(--cw)*.6);border-radius:45% 45% 30% 30%;background:linear-gradient(90deg,#1c1f14,#4a4f36,#1c1f14);box-shadow:0 0 4px #000;pointer-events:none}
@@ -968,6 +968,7 @@ function renderBonus(){
     (b.arty?`<button class="bon" data-act="usearty">${ARTY_SVG}<span>Artilharia${b.arty>1?' ×'+b.arty:''}</span></button>`:'')+
     (PLUS&&sel&&board[sel[0]][sel[1]]&&board[sel[0]][sel[1]].sid!=null?`<button class="bon" data-act="selficha"><span>Ficha</span></button>`:'');
 }
+{const im=new Image();im.src='aviao.webp'}
 const BOMBER_SVG=(()=>`<svg viewBox="0 0 200 160" aria-hidden="true"><defs><linearGradient id="bwg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d7550"/><stop offset=".45" stop-color="#4f5638"/><stop offset="1" stop-color="#363b26"/></linearGradient><linearGradient id="bfg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a4029"/><stop offset=".45" stop-color="#7a8259"/><stop offset=".55" stop-color="#6a7149"/><stop offset="1" stop-color="#343a24"/></linearGradient><radialGradient id="bgl" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#e8f4ff"/><stop offset=".6" stop-color="#7d9bb3"/><stop offset="1" stop-color="#2c3a46"/></radialGradient><radialGradient id="bpr"><stop offset="0" stop-color="rgba(30,30,25,.0)"/><stop offset=".7" stop-color="rgba(30,30,25,.25)"/><stop offset="1" stop-color="rgba(30,30,25,.05)"/></radialGradient></defs><path d="M100 62 L192 74 Q196 75 196 79 L196 83 Q196 86 192 86 L104 88 L96 88 L8 86 Q4 86 4 83 L4 79 Q4 75 8 74 Z" fill="url(#bwg)" stroke="#23271a" stroke-width="1.2"/><path d="M30 76 L30 85 M60 72 L60 87 M140 72 L140 87 M170 76 L170 85" stroke="#2d3220" stroke-width=".8" opacity=".6"/><path d="M100 132 L132 138 Q135 139 134 142 L132 145 L100 143 L68 145 L66 142 Q65 139 68 138 Z" fill="url(#bwg)" stroke="#23271a" stroke-width="1"/><path d="M97 118 L103 118 L102 156 L98 156 Z" fill="#454b31" stroke="#23271a" stroke-width=".8"/><path d="M100 8 Q110 10 111 30 L112 112 Q111 140 100 150 Q89 140 88 112 L89 30 Q90 10 100 8 Z" fill="url(#bfg)" stroke="#23271a" stroke-width="1.2"/><path d="M100 10 Q107 12 108 22 L92 22 Q93 12 100 10 Z" fill="url(#bgl)" stroke="#1d2216" stroke-width=".8"/><path d="M94 32 Q100 28 106 32 L105 40 L95 40 Z" fill="url(#bgl)" stroke="#1d2216" stroke-width=".8"/><circle cx="100" cy="66" r="4" fill="url(#bgl)" stroke="#1d2216" stroke-width=".6"/><path d="M92 50 H108 M91 96 H109 M92 120 H108" stroke="#2d3220" stroke-width=".7" opacity=".6"/><g class="eng">${[38,66,134,162].map(x=>`<rect x="${x-6}" y="58" width="12" height="26" rx="5" fill="#3d4329" stroke="#1d2216"/><rect x="${x-4}" y="56" width="8" height="5" rx="2" fill="#2a2e1e"/><circle cx="${x}" cy="56" r="11" fill="url(#bpr)" class="prop"/><g class="blades" style="transform-origin:${x}px 56px"><rect x="${x-.9}" y="45" width="1.8" height="22" fill="#151510" opacity=".55"/><rect x="${x-11}" y="55.1" width="22" height="1.8" fill="#151510" opacity=".55"/></g>`).join('')}</g></svg>`)();
 const PLANE_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 0 3 3 3 7v12l24 9v5l-24-4v15l7 5v4l-10-3-10 3v-4l7-5V33L5 37v-5l24-9V11c0-4 1-7 3-7z" fill="currentColor"/></svg>';
 const ARTY_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 44l30-26 5 5-30 26z M30 40a10 10 0 1 0 0.1 0z M14 52h34v5H14z" fill="currentColor"/></svg>';
@@ -992,8 +993,8 @@ function killAt(r,c,side,why){
 }
 async function planeRun(side,r){
   const g=$('grid'),opp=side==='p'?'a':'p',[,y]=cellXY(r,0),cw=g.clientWidth/COLS;
-  const pl=document.createElement('div');pl.className='plane'+(side==='a'?' en':'');pl.innerHTML=BOMBER_SVG;pl.style.top=y+'px';g.appendChild(pl);
-  const sh=document.createElement('div');sh.className='planeshadow'+(side==='a'?' en':'');sh.innerHTML=BOMBER_SVG;sh.style.top=(y+cw*.9)+'px';g.appendChild(sh);
+  const pl=document.createElement('div');pl.className='plane'+(side==='a'?' en':'');pl.innerHTML='<img src="aviao.webp" alt="">';pl.style.top=y+'px';g.appendChild(pl);
+  const sh=document.createElement('div');sh.className='planeshadow'+(side==='a'?' en':'');sh.innerHTML='<img src="aviao.webp" alt="">';sh.style.top=(y+cw*.9)+'px';g.appendChild(sh);
   if(has('amb_aviao'))play('amb_aviao','plane',{dur:3,fadeIn:.4,fadeOut:1,vol:1,offset:8});
   const x0=side==='p'?-cw*3:g.clientWidth+cw*3,x1=side==='p'?g.clientWidth+cw*3:-cw*3,dur=2600;
   const tg=rowTargets(opp,r),pick=tg[Math.random()*tg.length|0];let txt='';
