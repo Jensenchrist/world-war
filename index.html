@@ -400,7 +400,7 @@ const NATIONS={
  bra:{c:'br',n:'Brasil'},us:{c:'us',n:'Estados Unidos'},ar:{c:'ar',n:'Argentina'},fr:{c:'fr',n:'França'},de:{c:'de',n:'Alemanha'},
  ru:{c:'ru',n:'Rússia'},jp:{c:'jp',n:'Japão'},cn:{c:'cn',n:'China'},nl:{c:'nl',n:'Holanda'},it:{c:'it',n:'Itália'},uk:{c:'uk',n:'Reino Unido'}};
 const ADJ={bra:'Brasileiro',us:'Americano',ar:'Argentino',fr:'Francês',de:'Alemão',ru:'Russo',jp:'Japonês',cn:'Chinês',nl:'Holandês',it:'Italiano',uk:'Britânico'};
-const PATH=['ru','fr','de','it','nl','jp','cn','uk','bra','us','ar'];
+const PATH=['nl','ar','bra','it','fr','uk','us','cn','jp','de','ru'];
 const DIFF=[['Recruta',3.4,0,false],['Soldado',2.8,1,false],['Cabo',2.3,2,false],['Sargento',1.9,3,true],['Tenente',1.5,5,true],['Capitão',1.2,7,true],['Major',.9,10,true],['Coronel',.7,14,true],['General',.5,20,true],['Marechal',.3,999,true]];
 let NAT=(()=>{try{return JSON.parse(localStorage.getItem('cb_nation'))}catch(e){return null}})()||'us',LEVELS=[];
 function buildLevels(){LEVELS=PATH.filter(k=>k!==NAT).map((k,i)=>{const [d,noise,mem,smart]=DIFF[i];return{...NATIONS[k],key:k,d,noise,mem,smart,cards:k,spec:k}})}
@@ -931,7 +931,7 @@ function tropasSheet(){
 const DESC={'10':'O mais forte','3':'Desarma bombas','2':'Anda 1 casa, como todos','1':'Derruba o Marechal se atacar','B':'Destrói quem ataca; não se move','M':'Dispara 1 vez e destrói qualquer carta inimiga, até a bandeira','F':'Não se move'};
 const RULES=()=>`<h3>Como jogar</h3>
 <p>Capture a bandeira inimiga, ou deixe o adversário sem cartas que possam se mover. Suas cartas têm selo vermelho; as do inimigo, verde, com a bandeira do país no verso.</p>
-<ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos.</li></ul>
+<ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
 <div class="grid2">${ORDER.map(k=>`<div>${tok(k,'p',true)}<span><b>${INFO[k].n}</b> ×${INITC[k]}<br><span style="color:var(--mute);font-size:13px">${DESC[k]||'Patente '+k}</span></span></div>`).join('')}</div>
 <button class="btn" data-act="close" style="width:100%;margin-top:8px">Entendi</button>`;
 function menuSheet(){
