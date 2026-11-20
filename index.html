@@ -447,6 +447,23 @@ body.desk #bonus{order:0;width:auto}
 .qrow b{display:block;font:600 15px Oswald,sans-serif}.qrow small{font:500 12px Oswald,sans-serif;color:#a7b08a;text-transform:uppercase;letter-spacing:.4px}
 .qrow em{margin-left:auto;color:#d9b25a;font-style:normal;font-weight:800}
 .qrow.dead{opacity:.75}.qrow.dead .face{filter:grayscale(1)}
+
+.report{position:relative;padding:28px 22px 30px;margin:4px 0 12px;color:#2b1d0e;font:15px/1.5 'Courier Prime','Courier New',monospace;
+ background:radial-gradient(ellipse at 50% 40%,#e9d7aa 0%,#d9bf86 55%,#b8935a 85%,#7a5a2e 100%);box-shadow:inset 0 0 60px rgba(70,40,10,.55),0 8px 24px rgba(0,0,0,.6);border-radius:3px;overflow:hidden}
+.report::before{content:"";position:absolute;inset:0;background:var(--noise);opacity:.5;mix-blend-mode:multiply;pointer-events:none}
+.report>*{position:relative}
+.report .rtitle{font:700 24px/1.1 'Courier Prime',monospace!important;text-transform:uppercase;text-align:center;margin:18px 0 4px!important;color:#2b1d0e!important;letter-spacing:1px}
+.rsub{text-align:center;margin:0 0 14px;font-size:13px;color:#5a4120}
+.report h4{font:700 15px 'Courier Prime',monospace;color:#8a1c12;text-transform:uppercase;margin:16px 0 6px;letter-spacing:.5px}
+.report p{margin:6px 0;color:#2b1d0e!important;font-size:14.5px}
+.rstats{margin:0;padding-left:18px}.rstats li{margin:3px 0;color:#2b1d0e!important;font-size:14px}.rstats li.kia{color:#7a140c!important}
+.rcode{position:absolute;right:14px;top:10px;font-size:10px;color:#5a4120;letter-spacing:.5px}
+.rnote{font-size:12.5px!important;color:#6b5230!important;font-style:italic}
+.rsign{margin-top:22px;text-align:right;font-size:13px;color:#4a3518}.rsign span{display:block;margin-top:14px;color:#4a3518}
+.rstamp{position:absolute;font:700 14px 'Courier Prime',monospace;text-transform:uppercase;letter-spacing:1px;color:#a51c12;border:3px solid #a51c12;padding:3px 10px;opacity:.82;mix-blend-mode:multiply}
+.rstamp.r1{left:14px;top:12px;transform:rotate(-6deg)}
+.rstamp.r2{position:relative;display:inline-block;margin:4px 0 0 4px;transform:rotate(-4deg);font-size:13px}
+.rstamp.r3{left:18px;bottom:22px;transform:rotate(-14deg);border-radius:50%;padding:14px 10px;color:#7a5a2e;border-color:#7a5a2e;font-size:12px}
 </style>
 </head>
 <body>
@@ -839,6 +856,7 @@ function startBattle(){
   store.set('cb_form3',g);
   phase='play';sel=null;selType=null;last=[];rep={};strike=null;bonus={p:{plane:0,arty:0},a:{plane:0,arty:0}};
   if(PLUS)careerStart();
+  BST={t0:Date.now(),turns:0,used:{p:[],a:[]}};
   say(`Batalha contra ${LV.n}! Depois de cada confronto as cartas viram de novo: memorize o que viu.`);
   render();layout();
 }
@@ -953,7 +971,7 @@ async function aiTurnRun(pre=''){
   say(pre+(e2?e2.txt+' Sua vez.':'O inimigo moveu uma carta. Sua vez.'));render();
 }
 /* ===================== AVIÃO E ARTILHARIA ===================== */
-let strike=null,bonus={p:{plane:0,arty:0},a:{plane:0,arty:0}};
+let BST={};let strike=null,bonus={p:{plane:0,arty:0},a:{plane:0,arty:0}};
 function onKill(killer,victim){
   let t='';
   if(victim.k==='9'){bonus[killer.side].plane++;t+=killer.side==='p'?' Você ganhou um avião bombardeiro!':' O inimigo ganhou um avião bombardeiro!'}
@@ -1020,6 +1038,7 @@ async function artyRun(side,r,c){
   return txt;
 }
 async function playerStrike(type,r,c){
+  BST.used&&BST.used.p.push(type==='plane'?'Bombardeio aéreo':'Barragem de artilharia');BST.turns++;
   busy=true;strike=null;sel=null;render();
   const txt=type==='plane'?await planeRun('p',r):await artyRun('p',r,c);
   bonus.p[type]--;say(txt);render();
@@ -1101,13 +1120,14 @@ function reorg(A,date,log){
   for(const k of RANKS_S){let need=INITC[k]-alive(k).length;while(need-->0){const s=newSoldier(A,A.nat,k,date,true);A.soldiers.push(s)}}
 }
 function careerEnd(win){
-  const out={promo:[],fallen:[],rec:0};
+  const out={promo:[],fallen:[],rec:0,mvp:null,medals:[],date:ARMY.p.date};
   for(const side of ['p','a']){const A=ARMY[side],opp=ARMY[side==='p'?'a':'p'],won=side==='p'?win:!win;
     for(const s of A.soldiers){if(!s._b)continue;
       s.battles++;s.fronts.push(`${NATIONS[opp.nat].n} (${dstr(A.date)})`);
       s._m=s._b.merit;
-      if(s.alive&&s._b.kills>=2)s.medals.push('Cruz de Combate');
-      if(s.alive&&s.kills.some(x=>x.d===A.date&&(x.k==='9'||x.k==='10')))s.medals.push('Medalha de Bravura');
+      if(side==='p'&&s._b.kills&&(!out.mvp||s._b.kills>out.mvp.n))out.mvp={s,n:s._b.kills};
+      if(s.alive&&s._b.kills>=2){s.medals.push('Cruz de Combate');if(side==='p')out.medals.push({s,m:'Cruz de Combate'})}
+      if(s.alive&&s.kills.some(x=>x.d===A.date&&(x.k==='9'||x.k==='10'))){s.medals.push('Medalha de Bravura');if(side==='p')out.medals.push({s,m:'Medalha de Bravura'})}
       if(s.alive&&won)s.log.push(`${dstr(A.date)}: vitória contra ${NATIONS[opp.nat].n}`);
       if(!s.alive&&s.died===A.date&&side==='p')out.fallen.push(s);
       delete s._b}
@@ -1161,6 +1181,7 @@ function quartelSheet(){
 }
 
 async function playerMortar(fr,fc,tr,tc){
+  BST.used&&BST.used.p.push('Morteiro');BST.turns++;
   busy=true;aiming=null;sel=null;
   const txt=await fireMortar(fr,fc,tr,tc);say(txt);
   if(!board.flat().some(p=>p&&p.side==='a'&&p.k==='F'))return finish(true,txt);
@@ -1168,7 +1189,7 @@ async function playerMortar(fr,fc,tr,tc){
   await wait(900);await aiTurnRun(txt+' ');
 }
 async function playerMove(fr,fc,tr,tc){
-  busy=true;sel=null;
+  busy=true;sel=null;BST.turns=(BST.turns||0)+1;
   const ev=doMove(fr,fc,tr,tc);render();
   if(ev){await clash(ev);say(ev.txt)}
   if(checkEnd('p',ev))return;
@@ -1230,9 +1251,46 @@ function endScreen(win,why,nx,car){
    <div class="ribbon">Derrota</div>
    <div class="nplate dim"><i style="background:${FLAGS[L.c]}"></i>Exército ${ADJ[L.k]}</div>
    <p class="eswhy">${camp?'Campanha concluída! ':''}${why}${nx?` Próxima fase: ${nx.n}.`:''}</p>${car?careerSummary(car):''}
-   <div class="stack">${nx?`<button class="btn" data-lv="${lvIdx+1}">Enfrentar ${nx.n}</button>`:`<button class="btn" data-act="new">${win?'Jogar de novo':'Tentar de novo'}</button>`}
+   <div class="stack"><button class="btn" data-act="relatorio">Relatório da companhia</button>
    <button class="btn ghost" data-act="endclose">Ver o tabuleiro revelado</button><button class="btn ghost" data-act="camp">Campanha</button></div></div>`;
   $('endscr').classList.add('on');$('endscr').scrollTop=0;
+  REP={win,why,nx,car};
+}
+let REP=null;
+const OPS=['Tempestade de Ferro','Martelo','Aurora Vermelha','Lança','Trovão','Ponte Quebrada','Vigília','Fogo Cruzado','Punho de Aço','Último Bastião','Raposa','Neblina'];
+function reportSheet(){
+  if(!REP)return;const {win,why,nx,car}=REP;
+  const cnt=a=>{const c={};a.forEach(k=>c[k]=(c[k]||0)+1);return c};
+  const lp=cnt(dead.p),la=cnt(dead.a),tp=dead.p.length,ta=dead.a.length;
+  const row=(c)=>ORDER.filter(k=>c[k]).map(k=>`${INFO[k].n} ×${c[k]}`).join(', ')||'Nenhuma';
+  const d=car?car.date:{y:1940+Math.floor(lvIdx/3),m:1+(lvIdx%3)*4};
+  const op=OPS[(lvIdx*7+NAT.length)%OPS.length];
+  const mins=Math.max(1,Math.round((Date.now()-(BST.t0||Date.now()))/60000));
+  const lines=[];
+  if(car){
+    if(car.mvp)lines.push(`<li><b>Destaque:</b> ${INFO[car.mvp.s.k].n} ${car.mvp.s.name}, ${car.mvp.n} abate${car.mvp.n>1?'s':''}.</li>`);
+    for(const m of car.medals)lines.push(`<li><b>Condecoração:</b> ${m.m} para ${INFO[m.s.k].n} ${m.s.name}.</li>`);
+    for(const p of car.promo)lines.push(`<li><b>Promoção:</b> ${p.s.name}, de ${INFO[p.from].n} a ${INFO[p.to].n}.</li>`);
+    for(const s of car.fallen)lines.push(`<li class="kia"><b>Morto em combate:</b> ${INFO[s.k].n} ${s.name}${s.by?`, abatido por ${s.by}`:''}.</li>`);
+    if(car.rec)lines.push(`<li><b>Reposição:</b> ${car.rec} recruta${car.rec>1?'s':''} incorporado${car.rec>1?'s':''} à companhia.</li>`);
+  }
+  sheet(`<div class="report">
+   <div class="rstamp r1">Confidencial</div>
+   <div class="rcode">Arquivo ${NAT.toUpperCase()}-${String(lvIdx+1).padStart(2,'0')}-${d.y}</div>
+   <h3 class="rtitle">Relatório da Companhia</h3>
+   <p class="rsub">Exército ${ADJ[NAT]} · Operação ${op} · ${dstr(d)}</p>
+   <p><b>Ao Comando-Geral:</b> relata-se o confronto contra o Exército ${ADJ[LV.key]} (fase ${lvIdx+1}, nível ${LV.d}). ${why}</p>
+   <h4>Resultado: ${win?'Vitória':'Derrota'}</h4><div class="rstamp r2">${win?'Missão cumprida':'Missão fracassada'}</div>
+   <ul class="rstats"><li><b>Duração:</b> ${BST.turns||0} jogadas, cerca de ${mins} min.</li>
+   <li><b>Nossas baixas (${tp}):</b> ${row(lp)}.</li>
+   <li><b>Baixas inimigas (${ta}):</b> ${row(la)}.</li>
+   <li><b>Apoio usado:</b> ${(BST.used&&BST.used.p.length)?BST.used.p.join(', '):'Nenhum'}.</li></ul>
+   ${car?`<h4>Pessoal</h4><ul class="rstats">${lines.join('')||'<li>Sem alterações no efetivo.</li>'}</ul>`:'<p class="rnote">Ative o Modo Plus para registrar nomes, promoções e condecorações.</p>'}
+   <h4>Ordens</h4><p>${nx?`A companhia segue para enfrentar o Exército ${ADJ[nx.key]}.`:win?'Campanha encerrada. A companhia retorna para casa.':'Reagrupar e tentar novamente.'}</p>
+   <div class="rsign">Comandante da Companhia<br><span>____________________</span></div>
+   <div class="rstamp r3">Aprovado</div></div>
+   <div class="stack">${nx?`<button class="btn" data-lv="${lvIdx+1}">Enfrentar ${nx.n}</button>`:`<button class="btn" data-act="new">${win?'Jogar de novo':'Tentar de novo'}</button>`}
+   <button class="btn ghost" data-act="camp">Campanha</button><button class="btn ghost" data-act="close">Ver o tabuleiro revelado</button></div>`);
 }
 function say(h){$('msg').innerHTML='<span>'+h+'</span>'}
 
@@ -1357,6 +1415,7 @@ document.addEventListener('click',e=>{
   else if(a==='volreset'){Object.assign(VOL,VOLDEF);store.set('cb_vol',VOL);for(const k in BUS)BUS[k].gain.value=VOL[k];setMusicVol(VOL.music);soundSheet()}
   else if(a==='tropas')tropasSheet();
   else if(a==='close')closeSheet();
+  else if(a==='relatorio'){$('endscr').classList.remove('on');reportSheet()}
   else if(a==='endclose')$('endscr').classList.remove('on');
   else if(a==='home'){closeSheet();home()}
   else if(a==='quit'){closeSheet();finish(false,'Você desistiu da partida.')}
