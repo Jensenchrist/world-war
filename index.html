@@ -464,6 +464,15 @@ body.desk #bonus{order:0;width:auto}
 .rstamp.r1{left:14px;top:12px;transform:rotate(-6deg)}
 .rstamp.r2{position:relative;display:inline-block;margin:4px 0 0 4px;transform:rotate(-4deg);font-size:13px}
 .rstamp.r3{left:18px;bottom:22px;transform:rotate(-14deg);border-radius:50%;padding:14px 10px;color:#7a5a2e;border-color:#7a5a2e;font-size:12px}
+
+.slots{display:grid;gap:8px}
+.slot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 12px;border-radius:8px;background:rgba(0,0,0,.4);box-shadow:inset 0 0 0 1px rgba(217,178,90,.3)}
+.slot.empty{opacity:.7}
+.sinfo{flex:1 1 160px;min-width:0;display:grid;gap:2px}
+.sinfo b{font:700 16px Oswald,sans-serif;text-transform:uppercase;color:#f0d68e}
+.sinfo span{font:600 14px Oswald,sans-serif;color:#efe6c4}.sinfo small{font:500 12px Oswald,sans-serif;color:#a7b08a}
+.sbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.sbtns .btn.sm{min-height:40px;padding:0 10px;font-size:13px!important}
 </style>
 </head>
 <body>
@@ -477,6 +486,7 @@ body.desk #bonus{order:0;width:auto}
 <section id="campaign" class="screen">
   <div class="bar"><button class="icon" data-act="home" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>Campanha</h2><span class="pill s" id="campPill"></span></div>
   <button class="lv me" data-act="nat" id="meNat"></button>
+  <button class="lv" data-act="slots" style="margin-top:8px"><span><b>Jogos salvos</b><span>Continue de onde parou</span></span></button>
   <div class="plusrow"><button class="lv" data-act="plus" id="plusBtn"></button><button class="lv" data-act="quartel" id="quartelBtn"><span><b>Quartel</b><span>Fichas e caídos</span></span></button></div>
   <p class="tag" style="margin:10px 2px 6px">Derrote os 10 exércitos, um de cada vez. Cada fase é mais difícil: o inimigo erra menos e lembra por mais tempo das cartas que já viu.</p>
   <div class="camp" id="camp"></div>
@@ -1386,9 +1396,47 @@ const RULES=()=>`<h3>Como jogar</h3>
 <ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Derrube o General inimigo e ganhe um <b>avião bombardeiro</b>: ele passa por uma fileira e derruba uma carta. Derrube o Marechal e ganhe a <b>artilharia</b>: atinge a carta escolhida e uma vizinha. Se o golpe cair na bandeira, ela troca de lugar em segredo com uma carta vizinha, que é atingida no lugar dela.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
 <div class="grid2">${ORDER.map(k=>`<div>${tok(k,'p',true)}<span><b>${INFO[k].n}</b> ×${INITC[k]}<br><span style="color:var(--mute);font-size:13px">${DESC[k]||'Patente '+k}</span></span></div>`).join('')}</div>
 <button class="btn" data-act="close" style="width:100%;margin-top:8px">Entendi</button>`;
+/* ===================== JOGOS SALVOS (5 espaços) ===================== */
+const SLOTS=5;
+function snapshot(){
+  return {v:1,t:Date.now(),NAT,lvIdx,PLUS,phase,board,dead,rep,last,uid,aiTurn,aiMem:[...aiMem],bonus,BST,
+    ARMY:PLUS?ARMY:null,meta:{nat:NATIONS[NAT].n,foe:LV.n,fase:lvIdx+1,turns:BST.turns||0,
+      left:{p:board.flat().filter(p=>p&&p.side==='p').length,a:board.flat().filter(p=>p&&p.side==='a').length}}};
+}
+function saveSlot(i){
+  if(phase!=='play'||busy){say('Só dá para salvar na sua vez, durante a batalha.');return false}
+  const ok=store.set('cb_save_'+i,snapshot());
+  if(!ok){say('Não foi possível salvar: memória do navegador cheia.');return false}
+  return true;
+}
+function loadSlot(i){
+  const g=store.get('cb_save_'+i);if(!g)return;
+  NAT=g.NAT;store.set('cb_nation',NAT);buildLevels();lvIdx=g.lvIdx;LV=LEVELS[lvIdx];
+  PLUS=g.PLUS;store.set('cb_plus',PLUS);
+  board=g.board;dead=g.dead;rep=g.rep||{};last=g.last||[];uid=g.uid;aiTurn=g.aiTurn;
+  aiMem.clear();for(const [k,v] of g.aiMem)aiMem.set(k,v);
+  bonus=g.bonus;BST=g.BST||{};BST.t0=Date.now()-((BST.turns||0)*20000);
+  sel=null;selType=null;aiming=null;strike=null;busy=false;popAt=-1;
+  if(PLUS&&g.ARMY){ARMY=g.ARMY;SOLD=new Map();
+    for(const row of board)for(const p of row)if(p&&p.sid!=null){const [nat,id]=String(p.sid).split(':');const A=ARMY.p.nat===nat?ARMY.p:ARMY.a;const s2=A.soldiers.find(x=>x.id===+id);if(s2)SOLD.set(p.sid,s2)}}
+  closeSheet();$('endscr').classList.remove('on');
+  phase='play';show('play');
+  say(`Jogo carregado: ${NATIONS[NAT].n} contra ${LV.n}, fase ${lvIdx+1}. Sua vez.`);
+  render();layout();
+}
+function slotsSheet(mode){
+  const canSave=phase==='play'&&!busy;
+  const rows=[];for(let i=1;i<=SLOTS;i++){const g=store.get('cb_save_'+i);
+    const when=g?new Date(g.t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    rows.push(`<div class="slot${g?'':' empty'}"><div class="sinfo"><b>Espaço ${i}</b>${g?`<span>${g.meta.nat} × ${g.meta.foe} · fase ${g.meta.fase}${g.PLUS?' · Plus':''}</span><small>${g.meta.left.p} × ${g.meta.left.a} cartas · ${g.meta.turns} jogadas · ${when}</small>`:'<span>Vazio</span>'}</div>
+      <div class="sbtns">${canSave?`<button class="btn sm" data-act="slotsave" data-slot="${i}">${g?'Salvar aqui':'Salvar'}</button>`:''}${g?`<button class="btn ${canSave?'ghost ':''}sm" data-act="slotload" data-slot="${i}">Carregar</button><button class="btn ghost sm" data-act="slotdel" data-slot="${i}" aria-label="Apagar">✕</button>`:''}</div></div>`)}
+  sheet(`<h3>${canSave?'Salvar ou carregar':'Jogos salvos'}</h3>${canSave?'<p style="margin:0 0 10px;color:var(--mute)">O jogo é salvo exatamente como está no tabuleiro.</p>':''}<div class="slots">${rows.join('')}</div>
+   <button class="btn ghost" data-act="close" style="width:100%;margin-top:12px">Fechar</button>`);
+}
 function menuSheet(){
   sheet(`<h3>Menu</h3><div class="stack">
   <button class="btn ghost" data-act="close">Continuar</button>
+  <button class="btn ghost" data-act="slots">${phase==='play'?'Salvar / carregar jogo':'Jogos salvos'}</button>
   <button class="btn ghost" data-act="rules">Como jogar</button>
   ${phase==='play'?'<button class="btn ghost" data-act="quit">Desistir da partida</button>':'<button class="btn ghost" data-act="new">Recomeçar fase</button>'}
   <button class="btn ghost" data-act="camp">Campanha</button>
@@ -1412,6 +1460,10 @@ document.addEventListener('click',e=>{
   else if(a==='camp'){closeSheet();campaign()}
   else if(a==='menu')menuSheet();
   else if(a==='nat')natSheet();
+  else if(a==='slots')slotsSheet();
+  else if(a==='slotsave'){const i=+b.dataset.slot;if(saveSlot(i)){slotsSheet();say(`Jogo salvo no espaço ${i}.`)}}
+  else if(a==='slotload')loadSlot(+b.dataset.slot);
+  else if(a==='slotdel'){const i=+b.dataset.slot;if(b.dataset.sure){try{localStorage.removeItem('cb_save_'+i)}catch(e){}slotsSheet()}else{b.dataset.sure=1;b.textContent='Apagar?'}}
   else if(a==='plus'){PLUS=!PLUS;store.set('cb_plus',PLUS);campaign()}
   else if(a==='quartel')quartelSheet();
   else if(a==='ficha'){const sid=b.dataset.sid;const sd=findSoldier(sid);if(sd)fichaSheet(sd.s,sd.nat)}
