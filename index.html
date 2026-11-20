@@ -596,7 +596,7 @@ function repBlocked(p,fr,fc,tr,tc){const x=rep[p.side];return !!x&&x.id===p.id&&
 const legal=(r,c)=>{const p=board[r][c];return movesFrom(r,c).filter(([tr,tc])=>board[tr][tc]||!repBlocked(p,r,c,tr,tc))};
 function fight(a,d){
   if(d.k==='F'||d.k==='M')return'a';
-  if(d.k==='B')return a.k==='3'?'a':'d';
+  if(d.k==='B')return a.k==='3'?'a':'both';
   if(a.k==='1'&&d.k==='10')return'a';
   const x=+a.k,y=+d.k;return x>y?'a':x<y?'d':'both';
 }
@@ -619,7 +619,7 @@ function doMove(fr,fc,tr,tc){
   const an=(mine?'Seu ':'')+INFO[a.k].n+(mine?'':' inimigo'),dn=(mine?'o ':'seu ')+INFO[d.k].n+(mine?' inimigo':'');
   let txt;
   if(d.k==='F')txt=`${an} capturou a bandeira!`;
-  else if(d.k==='B')txt=res==='a'?`${an} desarmou ${mine?'uma bomba inimiga':'uma bomba sua'}.`:`${an} explodiu numa bomba.`;
+  else if(d.k==='B')txt=res==='a'?`${an} desarmou ${mine?'uma granada inimiga':'uma granada sua'}.`:`${an} pisou numa granada: os dois saíram do jogo.`;
   else if(res==='a')txt=`${an} (${a.k}) derrotou ${dn} (${d.k}).`;
   else if(res==='d')txt=`${an} (${a.k}) perdeu para ${dn} (${d.k}).`;
   else txt=`${an} e ${dn} (${a.k}) se eliminaram.`;
@@ -795,7 +795,7 @@ function ambStart(){if(ambOn)return;ambOn=true;
 function sfxClash(ev){
   lastFlag=!!ev.flag;
   if(ev.flag){play('tiro','shot',{vol:.7});sfxFanfare(ev.a.side==='p')}
-  else if(ev.d.k==='B'&&ev.res==='d'){if(has('explosao')){play('explosao','boom');duck(2500)}else sfxBoom()}
+  else if(ev.d.k==='B'&&ev.res!=='a'){if(has('explosao')){play('explosao','boom');duck(2500)}else sfxBoom()}
   else if(ev.d.k==='B'){has('tiro')?play('tiro','shot',{vol:.5,rate:1.1}):sfxShot(0,.5)}
   else if(has('tiro')){const big=+ev.a.k>=8||+ev.d.k>=8;
     if(big&&has('metralhadora'))play('metralhadora','mg',{dur:1.6,fadeOut:.4,vol:.9});else play('tiro','shot',{rate:.95+Math.random()*.1});}
@@ -1240,7 +1240,7 @@ const WREATH=()=>{const id='gld'+(wrN++);let lv='';
 const flagOf=side=>FLAGS[side==='p'?NATIONS[NAT].c:LV.c];
 function clash(ev){
   const pa=ev.a.side==='p',win=ev.res==='a'?pa:ev.res==='d'?!pa:null;
-  const title=ev.flag?(pa?'Bandeira!':'Perdida!'):win===null?'Empate':win?'Vitória':'Derrota';
+  const title=ev.flag?(pa?'Bandeira!':'Perdida!'):(ev.d.k==='B'&&ev.res==='both')?'Explosão!':win===null?'Empate':win?'Vitória':'Derrota';
   const me=pa?ev.a:ev.d,foe=pa?ev.d:ev.a,meRole=pa?'a':'d',foeRole=pa?'d':'a';
   const lost=r=>ev.res==='both'||(ev.res==='a'&&r==='d')||(ev.res==='d'&&r==='a');
   const side=(x,r,cls,who)=>`<div class="side ${cls} ${lost(r)?'lose':'win'}">${tok(x.k,x.side,true)}<span class="who">${who}${nameOf(x)}</span><span class="tagp">${INFO[x.k].n}</span></div>`;
@@ -1390,7 +1390,7 @@ function tropasSheet(){
   const loss=dead.p.length?ORDER.filter(k=>lc[k]).map(k=>`<span class="m">${tok(k,'p',true)}${lc[k]}</span>`).join(''):'<span class="m" style="padding:8px 12px;font:600 14px Inter">Nenhuma ainda</span>';
   sheet(`<h3>Tropas</h3><div class="lbl">EXÉRCITO INIMIGO RESTANTE</div><div class="mini">${left}</div><div class="lbl">SUAS BAIXAS</div><div class="mini">${loss}</div><button class="btn" data-act="close" style="width:100%;margin-top:16px">Voltar ao jogo</button>`);
 }
-const DESC={'10':'O mais forte','3':'Desarma bombas','2':'Anda 1 casa, como todos','1':'Derruba o Marechal se atacar','B':'Destrói quem ataca; não se move','M':'Dispara 1 vez e destrói qualquer carta inimiga, até a bandeira','F':'Não se move'};
+const DESC={'10':'O mais forte','3':'Desarma bombas','2':'Anda 1 casa, como todos','1':'Derruba o Marechal se atacar','B':'Explode quem ataca e sai do jogo; não se move','M':'Dispara 1 vez e destrói qualquer carta inimiga, até a bandeira','F':'Não se move'};
 const RULES=()=>`<h3>Como jogar</h3>
 <p>Capture a bandeira inimiga, ou deixe o adversário sem cartas que possam se mover. Suas cartas têm selo vermelho; as do inimigo, verde, com a bandeira do país no verso.</p>
 <ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Derrube o General inimigo e ganhe um <b>avião bombardeiro</b>: ele passa por uma fileira e derruba uma carta. Derrube o Marechal e ganhe a <b>artilharia</b>: atinge a carta escolhida e uma vizinha. Se o golpe cair na bandeira, ela troca de lugar em segredo com uma carta vizinha, que é atingida no lugar dela.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
