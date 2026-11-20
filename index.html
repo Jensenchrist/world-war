@@ -379,6 +379,28 @@ body.bgh{background:#0e0b08 url(fundo_capa.webp) center/cover fixed}
 .lv.next .st{background:linear-gradient(#f3d27e,#a8772a)!important}
 .chip small{font-size:10px!important;letter-spacing:0!important;max-width:100%;overflow:hidden;text-overflow:clip}
 .lv.lock{opacity:.7}
+
+/* ===== versão computador (tela larga): tabuleiro deitado ===== */
+body.desk .app{max-width:none;height:100vh;display:flex;flex-direction:column;padding:12px 18px}
+body.desk #play.on{flex:1;min-height:0;display:grid;gap:12px;grid-template-columns:minmax(0,1fr) minmax(300px,380px);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"bar bar" "stage setup" "stage setup"}
+body.desk.big #play.on{grid-template-columns:96px minmax(0,1fr) 96px;grid-template-areas:"bar bar bar" "kp stage ke" "panel panel panel"}
+body.desk .bar{grid-area:bar;margin:0;max-width:1100px;width:100%;justify-self:center}
+body.desk #stage{grid-area:stage;min-height:0;display:flex;align-items:center;justify-content:center}
+body.desk #setupPanel{grid-area:setup;overflow:auto;align-self:center}
+body.desk #setupPanel .tray{grid-template-columns:repeat(4,minmax(0,1fr))}
+body.desk #kills{grid-area:ke;margin:0}
+body.desk #killsP{grid-area:kp;margin:0!important}
+body.desk #gamePanel{grid-area:panel;max-width:1100px;width:100%;justify-self:center;margin:0}
+body.desk.big .kills{flex-direction:column;align-self:center;padding:10px 6px}
+body.desk .kills .kl{border-right:0;border-bottom:1px solid rgba(217,178,90,.35);padding:0 0 6px}
+body.desk .kills .kr{grid-template-columns:1fr!important;gap:6px;width:62px}
+body.desk .inner{transform-origin:0 0;left:0;top:0;bottom:auto}
+body.desk #grid .c{transform:rotate(-90deg)}
+body.desk #grid .c .tok.wide{width:calc(var(--ch)*.96)}
+body.desk #grid .c .tok:not(.wide){height:calc(var(--cw)*.92)}
+body.desk #clash .cfbg{width:calc(100vh*941/1672);left:50%}
+body.desk .cl .duel .tok{width:min(26vh,240px)!important}
+body.desk .hint{font-size:16px}
 </style>
 </head>
 <body>
@@ -670,9 +692,19 @@ function sfxClash(ev){
 /* ---------- layout ---------- */
 function layout(){
   const big=(phase==='play'||phase==='over')&&$('play').classList.contains('on');
-  document.body.classList.toggle('big',big);
+  const desk=innerWidth>=900&&innerWidth>innerHeight*1.15;
+  document.body.classList.toggle('big',big);document.body.classList.toggle('desk',desk);
   const st=$('stage'),view=$('view'),inner=$('boardInner');
   let W,H,VH;
+  if(desk&&$('play').classList.contains('on')){
+    // tabuleiro deitado: gira 90°, seu exército à esquerda
+    const avH=st.clientHeight-14,avW=st.clientWidth-14;
+    W=Math.max(300,Math.min(avH,avW/MAPR));H=W*MAPR;
+    inner.style.width=W+'px';inner.style.height=H+'px';view.style.width=H+'px';view.style.height=W+'px';
+    inner.style.transform=`translate(${H}px,0) rotate(90deg)`;
+    inner.style.setProperty('--cw',W/COLS+'px');inner.style.setProperty('--ch',H/ROWS+'px');return;
+  }
+  inner.style.transform='';
   if(big){W=Math.min(st.clientWidth-12,(st.clientHeight-6)/MAPR,620);H=W*MAPR;VH=H}
   else{W=Math.min(st.clientWidth-10,560,(innerHeight-480)/MAPR);W=Math.max(W,260);H=W*MAPR;VH=H}
   inner.style.width=W+'px';inner.style.height=H+'px';view.style.width=W+'px';view.style.height=VH+'px';
@@ -767,7 +799,7 @@ function mortarBoom(){
   const g2=AC.createGain();g2.gain.setValueAtTime(1.3,t);g2.gain.exponentialRampToValueAtTime(.0001,t+.7);o.connect(g2).connect(bus('mortar'));o.start(t);o.stop(t+.75);
   duck(1500);
 }
-function cellXY(r,c){const g=$('grid'),el=g.querySelector(`[data-i="${r*10+c}"]`)||g.children[r*10+c],gr=g.getBoundingClientRect(),e=el.getBoundingClientRect();return[e.left-gr.left+e.width/2,e.top-gr.top+e.height/2]}
+function cellXY(r,c){const g=$('grid'),el=g.children[r*10+c];return[el.offsetLeft+el.offsetWidth/2,el.offsetTop+el.offsetHeight/2]}
 function scorch(r,c){const g=$('grid'),[x,y]=cellXY(r,c),e=document.createElement('div');e.className='scorch';e.style.left=x+'px';e.style.top=y+'px';g.appendChild(e);setTimeout(()=>e.remove(),4000)}
 async function fireMortar(fr,fc,tr,tc){
   const m=board[fr][fc],t=board[tr][tc],side=m.side,mine=side==='p';
@@ -990,6 +1022,7 @@ function menuSheet(){
 }
 
 /* ---------- eventos ---------- */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(aiming){aiming=null;say('Disparo cancelado.')}sel=null;if($('sheet').classList.contains('on'))closeSheet();render()}});
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.c');if(!b||b.dataset.i==null)return;const i=+b.dataset.i,r=i/10|0,c=i%10;
   if(phase==='setup')tapSetup(r,c);else tapPlay(r,c)});
 $('tray').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.dataset.k;if(!tray[k])return;selType=selType===k?null:k;sel=null;render()});
