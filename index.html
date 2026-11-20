@@ -332,6 +332,7 @@ font:400 clamp(38px,11vw,58px)/1 'Black Ops One',sans-serif;letter-spacing:2px;c
 @keyframes sc{0%,70%{opacity:1}100%{opacity:0}}
 .flashfull{position:fixed;inset:0;z-index:60;pointer-events:none;background:radial-gradient(circle,rgba(255,240,200,.75),rgba(255,160,60,.35));animation:ff .45s ease-out forwards}
 @keyframes ff{from{opacity:1}to{opacity:0}}
+body.bgh{background:#0e0b08 url(fundo_capa.webp) center/cover fixed}
 </style>
 </head>
 <body>
@@ -635,7 +636,7 @@ function layout(){
 addEventListener('resize',()=>layout());
 
 /* ---------- telas ---------- */
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));document.body.classList.toggle('bgc',id==='campaign');document.body.classList.toggle('sp',id==='home'||id==='campaign');document.body.classList.toggle('bgb',id==='play');document.querySelectorAll('.hot').forEach(h=>h.classList.toggle('cur',h.dataset.nat===NAT));window.scrollTo(0,0);layout()}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));document.body.classList.toggle('bgc',id==='campaign');document.body.classList.toggle('bgh',id==='home');document.body.classList.toggle('sp',id==='home'||id==='campaign');document.body.classList.toggle('bgb',id==='play');document.querySelectorAll('.hot').forEach(h=>h.classList.toggle('cur',h.dataset.nat===NAT));window.scrollTo(0,0);layout()}
 function home(){phase='home';busy=false;show('home');layout()}
 function pickNation(k){closeSheet();NAT=k;store.set('cb_nation',k);buildLevels();campaign()}
 function progress(){return store.get('cb_camp_'+NAT)||{done:0}}
