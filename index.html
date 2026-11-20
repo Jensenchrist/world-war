@@ -401,6 +401,10 @@ body.desk #grid .c .tok:not(.wide){height:calc(var(--cw)*.92)}
 body.desk #clash .cfbg{width:calc(100vh*941/1672);left:50%}
 body.desk .cl .duel .tok{width:min(26vh,240px)!important}
 body.desk .hint{font-size:16px}
+#sparks{display:none!important}
+#brasasv{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:997;pointer-events:none;mix-blend-mode:screen;display:none;opacity:.95}
+body.sp #brasasv{display:block}
+@media (prefers-reduced-motion:reduce){#brasasv{display:none!important}}
 </style>
 </head>
 <body>
@@ -438,6 +442,7 @@ body.desk .hint{font-size:16px}
 </section>
 </div>
 <canvas id="sparks" aria-hidden="true"></canvas>
+<video id="brasasv" src="brasas.mp4" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
 <div id="clash"></div>
 <div id="endscr"></div>
 <audio id="bgm" src="som/musica.mp3" loop preload="auto"></audio>
@@ -618,10 +623,10 @@ function tok(k,side,show,extra=''){
 
 /* ---------- som ---------- */
 let soundOn=store.get('cb_sound')!==false,AC=null,lastFlag=false;
-const VOLDEF={music:.4,amb:.6,shot:1,boom:1,step:1,fanfare:1,mortar:1};
-const VOL={...VOLDEF,...(store.get('cb_vol')||{})};const BUS={};
+const VOLDEF={music:.4,amb_aviao:.6,amb_batalha:.6,amb_tanque:.6,amb_mg:.6,amb_canhao:.6,step:1,shot:1,mg:1,boom:1,mortar:1,fanfare:1};
+const VOL={...VOLDEF,...(store.get('cb_vol')||{})};delete VOL.amb;const BUS={};
 function bus(c){if(!BUS[c]){BUS[c]=AC.createGain();BUS[c].connect(AC.destination)}BUS[c].gain.value=VOL[c];return BUS[c]}
-function ensureAudio(){
+function ensureAudio(){{const v=$('brasasv');if(document.body.classList.contains('sp')&&v.paused)v.play().catch(()=>{})}
   if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
   if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});
   const m=$('bgm');if(AC&&!ensureAudio.src){try{ensureAudio.src=AC.createMediaElementSource(m);ensureAudio.src.connect(bus('music'));m.volume=1}catch(e){}}if(AC){loadSounds();ambStart()}if(!ensureAudio.src)m.volume=VOL.music;if(soundOn&&m.paused)m.play().catch(()=>{});
@@ -639,8 +644,10 @@ function sfxShot(t0=0,vol=1){
   const o=AC.createOscillator();o.frequency.setValueAtTime(170,t);o.frequency.exponentialRampToValueAtTime(42,t+.16);
   const g2=AC.createGain();g2.gain.setValueAtTime(.9*vol,t);g2.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(g2).connect(bus('shot'));o.start(t);o.stop(t+.22);
 }
+const STEPS=[[.27,.57],[1.33,.5],[2.46,.5],[3.46,.65],[4.64,.63],[5.84,.56]];
 function sfxStep(){
   if(!soundOn||!AC)return;
+  if(has('marcha')){const [o,d]=STEPS[Math.random()*STEPS.length|0];play('marcha','step',{offset:o,dur:d,rate:.95+Math.random()*.1,fadeOut:.08});return}
   for(const [dt,v,f0] of [[0,.55,900],[.17,.45,760]]){const t=AC.currentTime+dt;
     const n=AC.createBufferSource();n.buffer=noiseBuf(.12);
     const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(180,t+.09);
@@ -682,7 +689,7 @@ function sfxWhistle(dur){
 function setMusicVol(v){if(ensureAudio.src&&BUS.music){BUS.music.gain.cancelScheduledValues(AC.currentTime);BUS.music.gain.setTargetAtTime(v,AC.currentTime,.05)}else $('bgm').volume=Math.min(1,v)}
 function duck(ms){setMusicVol(VOL.music*.25);clearTimeout(duck.t);duck.t=setTimeout(()=>setMusicVol(VOL.music),ms)}
 /* ---------- sons gravados (pasta Effects do usuário) ---------- */
-const SND={};const SFILES=['tiro','metralhadora','explosao','estrondo','morteiro','canhao1','canhao2','canhao3','canhao4','amb_batalha','amb_tanque','amb_aviao'];
+const SND={};const SFILES=['marcha','tiro','metralhadora','explosao','estrondo','morteiro','canhao1','canhao2','canhao3','canhao4','amb_batalha','amb_tanque','amb_aviao'];
 let sndLoading=false;
 function loadSounds(){if(sndLoading||!AC)return;sndLoading=true;
   for(const n of SFILES)fetch(`som/${n}.mp3`).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,er)=>AC.decodeAudioData(b,ok,er))).then(buf=>SND[n]=buf).catch(()=>{});}
@@ -700,13 +707,13 @@ function play(n,cat,o={}){
 }
 const has=n=>!!SND[n];
 // ambiente: sons que entram e saem e depois voltam
-const AMB=[{n:'amb_aviao',vol:.55,fade:5,gap:[25,60]},{n:'amb_batalha',vol:.5,fade:4,gap:[15,40]},{n:'amb_tanque',vol:.4,fade:1.2,gap:[30,70]},
-  {n:'metralhadora',vol:.18,lp:1400,gap:[20,50]},{n:'canhao1',vol:.25,lp:900,gap:[18,45]},{n:'canhao3',vol:.22,lp:800,gap:[22,55]}];
+const AMB=[{n:'amb_aviao',c:'amb_aviao',vol:.55,fade:5,gap:[25,60]},{n:'amb_batalha',c:'amb_batalha',vol:.5,fade:4,gap:[15,40]},{n:'amb_tanque',c:'amb_tanque',vol:.4,fade:1.2,gap:[30,70]},
+  {n:'metralhadora',c:'amb_mg',vol:.18,lp:1400,gap:[20,50]},{n:'canhao1',c:'amb_canhao',vol:.25,lp:900,gap:[18,45]},{n:'canhao3',c:'amb_canhao',vol:.22,lp:800,gap:[22,55]}];
 let ambOn=false;
 function ambStart(){if(ambOn)return;ambOn=true;
   for(const a of AMB){const loop=()=>{const [x,y]=a.gap;a.t=setTimeout(()=>{
       if(soundOn&&!document.hidden&&has(a.n)){const len=SND[a.n].duration,dur=a.fade?Math.min(len,8+Math.random()*(len-8)):len,off=a.fade?Math.random()*Math.max(0,len-dur):0;
-        play(a.n,'amb',{vol:a.vol*(.7+Math.random()*.5),pan:(Math.random()*2-1)*.8,lp:a.lp,fadeIn:a.fade,fadeOut:a.fade,offset:off,dur,rate:.92+Math.random()*.16})}
+        play(a.n,a.c,{vol:a.vol*(.7+Math.random()*.5),pan:(Math.random()*2-1)*.8,lp:a.lp,fadeIn:a.fade,fadeOut:a.fade,offset:off,dur,rate:.92+Math.random()*.16})}
       loop()},(x+Math.random()*(y-x))*1000)};
     setTimeout(loop,Math.random()*8000)}}
 function sfxClash(ev){
@@ -715,7 +722,7 @@ function sfxClash(ev){
   else if(ev.d.k==='B'&&ev.res==='d'){if(has('explosao')){play('explosao','boom');duck(2500)}else sfxBoom()}
   else if(ev.d.k==='B'){has('tiro')?play('tiro','shot',{vol:.5,rate:1.1}):sfxShot(0,.5)}
   else if(has('tiro')){const big=+ev.a.k>=8||+ev.d.k>=8;
-    if(big&&has('metralhadora'))play('metralhadora','shot',{dur:1.6,fadeOut:.4,vol:.9});else play('tiro','shot',{rate:.95+Math.random()*.1});}
+    if(big&&has('metralhadora'))play('metralhadora','mg',{dur:1.6,fadeOut:.4,vol:.9});else play('tiro','shot',{rate:.95+Math.random()*.1});}
   else{sfxShot(0);sfxShot(.14,.75)}
 }
 
@@ -744,7 +751,7 @@ function layout(){
 addEventListener('resize',()=>layout());
 
 /* ---------- telas ---------- */
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));document.body.classList.toggle('bgc',id==='campaign');document.body.classList.toggle('bgh',id==='home');document.body.classList.toggle('sp',id==='home'||id==='campaign');document.body.classList.toggle('bgb',id==='play');document.querySelectorAll('.hot').forEach(h=>h.classList.toggle('cur',h.dataset.nat===NAT));window.scrollTo(0,0);layout()}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));document.body.classList.toggle('bgc',id==='campaign');document.body.classList.toggle('bgh',id==='home');document.body.classList.toggle('sp',id==='home'||id==='campaign');{const v=$('brasasv');if(id==='home'||id==='campaign')v.play().catch(()=>{});else v.pause()}document.body.classList.toggle('bgb',id==='play');document.querySelectorAll('.hot').forEach(h=>h.classList.toggle('cur',h.dataset.nat===NAT));window.scrollTo(0,0);layout()}
 function home(){phase='home';busy=false;show('home');layout()}
 function pickNation(k){closeSheet();NAT=k;store.set('cb_nation',k);buildLevels();campaign()}
 function progress(){return store.get('cb_camp_'+NAT)||{done:0}}
@@ -1014,16 +1021,18 @@ function killBar(side,el){
   el.innerHTML=`<span class="kl"><i style="background:${fl}"></i>${side==='a'?'Inimigo':'Suas'}</span><span class="kr">${KS.map(k=>{const n=lc[k]||0,all=n>=INITC[k];
     return `<span class="kp${all?' dead':''}" style="background-image:url(${cardSrc(k,side)||IMG(k,side)});background-position:${(pos[k]||'50% 5%/190% auto').split('/')[0]};background-size:${(pos[k]||'50% 5%/190% auto').split('/')[1]}">${n?`<em>${n}</em>`:''}<b>${k}</b></span>`}).join('')}</span>`;
 }
-const MIX=[['music','Música'],['amb','Ambiente de guerra'],['step','Passos de marcha'],['shot','Tiros (confronto)'],['boom','Explosão (granada)'],['mortar','Morteiro'],['fanfare','Vitória / derrota']];
+const MIX=[['-','Música'],['music','Trilha sonora'],
+ ['-','Ambiente de guerra'],['amb_aviao','Avião passando'],['amb_batalha','Batalha ao longe'],['amb_tanque','Tanque'],['amb_mg','Metralhadora distante'],['amb_canhao','Canhões distantes'],
+ ['-','Efeitos do jogo'],['step','Marcha (cartas andando)'],['shot','Tiro de fuzil (confronto)'],['mg','Metralhadora (confronto de oficiais)'],['boom','Explosão (granada)'],['mortar','Morteiro'],['fanfare','Vitória / derrota']];
 function soundSheet(){
   sheet(`<h3>Som</h3><button class="btn ${soundOn?'':'ghost'}" data-act="sound" style="width:100%">${soundOn?'Som ligado':'Som desligado'}</button>
-  <div class="mix">${MIX.map(([k,n])=>`<label class="mx"><span>${n}<em id="mv_${k}">${Math.round(VOL[k]*100)}%</em></span><input type="range" min="0" max="${k==='music'?100:150}" value="${Math.round(VOL[k]*100)}" data-vol="${k}"></label>`).join('')}</div>
+  <div class="mix">${MIX.map(([k,n])=>k==='-'?`<div class="lbl" style="margin:10px 0 0">${n}</div>`:`<label class="mx"><span>${n}<em id="mv_${k}">${Math.round(VOL[k]*100)}%</em></span><input type="range" min="0" max="${k==='music'?100:150}" value="${Math.round(VOL[k]*100)}" data-vol="${k}"></label>`).join('')}</div>
   <div class="row"><button class="btn ghost sm" data-act="volreset">Restaurar padrão</button><button class="btn sm" data-act="close">Pronto</button></div>`);
 }
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k)return;VOL[k]=e.target.value/100;store.set('cb_vol',VOL);
   $('mv_'+k).textContent=e.target.value+'%';if(k==='music')setMusicVol(VOL.music);else if(BUS[k])BUS[k].gain.value=VOL[k]});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k||!soundOn)return;ensureAudio();
-  ({amb:()=>play('amb_aviao','amb',{dur:4,fadeIn:.8,fadeOut:1.5}),step:sfxStep,shot:()=>has('tiro')?play('tiro','shot'):sfxShot(0),boom:()=>has('explosao')?play('explosao','boom'):sfxBoom(),mortar:()=>{if(has('morteiro')){play('morteiro','mortar');play('explosao','mortar',{at:1})}else{sfxWhistle(.8);setTimeout(()=>mortarBoom(),800)}},fanfare:()=>sfxFanfare(true)})[k]?.()});
+  ({amb_aviao:()=>play('amb_aviao','amb_aviao',{dur:4,fadeIn:.8,fadeOut:1.5}),amb_batalha:()=>play('amb_batalha','amb_batalha',{dur:4,fadeIn:.5,fadeOut:1}),amb_tanque:()=>play('amb_tanque','amb_tanque',{dur:3,fadeOut:1}),amb_mg:()=>play('metralhadora','amb_mg',{vol:.4,lp:1400,dur:2}),amb_canhao:()=>play('canhao1','amb_canhao',{vol:.5,lp:900}),mg:()=>play('metralhadora','mg',{dur:1.6,fadeOut:.4}),step:sfxStep,shot:()=>has('tiro')?play('tiro','shot'):sfxShot(0),boom:()=>has('explosao')?play('explosao','boom'):sfxBoom(),mortar:()=>{if(has('morteiro')){play('morteiro','mortar');play('explosao','mortar',{at:1})}else{sfxWhistle(.8);setTimeout(()=>mortarBoom(),800)}},fanfare:()=>sfxFanfare(true)})[k]?.()});
 function natSheet(){
   sheet(`<h3>Escolha seu exército</h3><div class="natgrid">${Object.keys(NATIONS).map(k=>`<button data-nat="${k}" class="${k===NAT?'cur':''}" aria-label="${NATIONS[k].n}"><img src="nac/${k}.webp" alt=""></button>`).join('')}</div><button class="btn ghost" data-act="close" style="width:100%;margin-top:14px">Fechar</button>`);
 }
