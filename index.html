@@ -333,6 +333,52 @@ font:400 clamp(38px,11vw,58px)/1 'Black Ops One',sans-serif;letter-spacing:2px;c
 .flashfull{position:fixed;inset:0;z-index:60;pointer-events:none;background:radial-gradient(circle,rgba(255,240,200,.75),rgba(255,160,60,.35));animation:ff .45s ease-out forwards}
 @keyframes ff{from{opacity:1}to{opacity:0}}
 body.bgh{background:#0e0b08 url(fundo_capa.webp) center/cover fixed}
+
+/* ===== UI KIT do usuário: metal enferrujado + moldura de latão chanfrada ===== */
+:root{--cut:9px;--gold:linear-gradient(180deg,#f6dc96 0%,#c9963a 38%,#6e4b12 52%,#b5852e 70%,#e9c46e 100%);
+--metal:url(fundo_capa.webp) center/360px auto,#16120e;
+--rivg:radial-gradient(circle at 10px 10px,#fff1b8 0 1.3px,#c9963a 2.2px,#3a2606 3.6px,transparent 4.2px),radial-gradient(circle at calc(100% - 10px) 10px,#fff1b8 0 1.3px,#c9963a 2.2px,#3a2606 3.6px,transparent 4.2px),radial-gradient(circle at 10px calc(100% - 10px),#fff1b8 0 1.3px,#c9963a 2.2px,#3a2606 3.6px,transparent 4.2px),radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),#fff1b8 0 1.3px,#c9963a 2.2px,#3a2606 3.6px,transparent 4.2px);
+--chamf:polygon(var(--cut) 0,calc(100% - var(--cut)) 0,100% var(--cut),100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,var(--cut) 100%,0 calc(100% - var(--cut)),0 var(--cut))}
+.btn,.btn.ghost,.lv,.bar,#msg,.tropas,.kills,.icon,.rulesbtn,.chip,.pill,.frame{position:relative;isolation:isolate;border:0!important;border-radius:0!important;
+ background:var(--gold)!important;clip-path:var(--chamf);box-shadow:none!important}
+.btn::before,.lv::before,.bar::before,#msg::before,.tropas::before,.kills::before,.icon::before,.rulesbtn::before,.chip::before,.pill::before,.frame::before{
+ content:"";position:absolute;inset:2.5px;z-index:-1;clip-path:polygon(calc(var(--cut) - 1px) 0,calc(100% - var(--cut) + 1px) 0,100% calc(var(--cut) - 1px),100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,calc(var(--cut) - 1px) 100%,0 calc(100% - var(--cut) + 1px),0 calc(var(--cut) - 1px));
+ background:var(--rivg),linear-gradient(180deg,rgba(255,235,190,.10),rgba(0,0,0,.35)),var(--metal);
+ box-shadow:inset 0 1px 0 rgba(255,230,170,.25),inset 0 -2px 4px rgba(0,0,0,.6);width:auto;border-radius:0;opacity:1}
+.icon::before,.pill::before,.chip::before{background:linear-gradient(180deg,rgba(255,235,190,.10),rgba(0,0,0,.35)),var(--metal)}
+.lv.next::before{box-shadow:inset 0 0 0 1px rgba(255,210,120,.5),inset 0 0 18px rgba(240,180,70,.35)}
+.lv{padding-left:14px!important}
+/* botão principal = latão (CONTINUAR) */
+.btn:not(.ghost){color:#1d1405!important;text-shadow:0 1px 0 rgba(255,240,200,.5)}
+.btn:not(.ghost)::before{background:var(--rivg),linear-gradient(180deg,#f3d27e 0%,#d6a548 45%,#a8772a 55%,#c99a45 100%)}
+.btn.ghost{color:#e8c777!important}
+.btn:active::before{filter:brightness(.8)}
+.btn:disabled::before{filter:grayscale(1) brightness(.6)}
+.btn,.lv b,.bar h2,.tropas,.pill,.rulesbtn,.chip small,.sh h3,.lbl{font-family:Oswald,'Arial Narrow',sans-serif!important;text-transform:uppercase}
+.bar h2,.bar h2 .vsbar{color:#f0d68e!important;text-shadow:0 2px 0 #000,0 0 10px rgba(240,190,90,.25)}
+.icon{color:#e8c777}
+.lv b{color:#f0e2bd}.lv .st{clip-path:var(--chamf);--cut:5px;border-radius:0!important}
+#msg{color:#ece2c6}
+/* tags (OFENSIVA / DEFESA / SUPORTE) */
+.pill{--cut:7px;color:#f4ead0!important}
+.pill::before{background:linear-gradient(180deg,#6f8a3a,#3e5420)}
+.pill.a::before{background:linear-gradient(180deg,#4f7a2c,#2c4a17)}
+.pill:not(.a):not(.s):not(.o)::before{background:linear-gradient(180deg,#b23a2c,#6e1710)}
+.pill.s::before{background:linear-gradient(180deg,#e7c56b,#a7802e)}.pill.s{color:#211808!important}
+.pill.o::before{background:#111}
+.pill{background:var(--gold)!important}
+/* molduras */
+.frame{--cut:14px;padding:7px!important}
+.frame::before{inset:3px}
+.sh{background:linear-gradient(rgba(10,8,6,.35),rgba(10,8,6,.55)),var(--metal)!important;border-top:3px solid #c9963a!important}
+.chip{--cut:7px}
+.kills{--cut:10px}
+#endscr .nplate,.clplate{clip-path:var(--chamf)}
+
+.lv.next::before{background:var(--rivg),radial-gradient(ellipse at 20% 50%,rgba(240,180,70,.28),transparent 70%),linear-gradient(180deg,rgba(255,235,190,.10),rgba(0,0,0,.35)),var(--metal)!important;box-shadow:inset 0 0 0 1px rgba(255,210,120,.6)!important}
+.lv.next .st{background:linear-gradient(#f3d27e,#a8772a)!important}
+.chip small{font-size:10px!important;letter-spacing:0!important;max-width:100%;overflow:hidden;text-overflow:clip}
+.lv.lock{opacity:.7}
 </style>
 </head>
 <body>
@@ -378,7 +424,7 @@ body.bgh{background:#0e0b08 url(fundo_capa.webp) center/cover fixed}
 <script>
 {
 /* ---------- dados ---------- */
-const R=[['10','Marechal','Mar',1,20],['9','General','Gen',1,14],['8','Coronel','Cel',1,10],['7','Major','Maj',2,7],['6','Capitão','Cap',3,5],['5','Tenente','Ten',3,4],['4','Sargento','Sgt',3,3],['3','Cabo','Cabo',4,5],['2','Soldado','Sd',5,2],['1','Espião','Esp',1,8],['B','Granada','Granada',4,2],['M','Morteiro','Mort.',1,6],['F','Bandeira','Band.',1,60]];
+const R=[['10','Marechal','Mar',1,20],['9','General','Gen',1,14],['8','Coronel','Cel',1,10],['7','Major','Maj',2,7],['6','Capitão','Cap',3,5],['5','Tenente','Ten',3,4],['4','Sargento','Sgt',3,3],['3','Cabo','Cabo',4,5],['2','Soldado','Sd',5,2],['1','Espião','Esp',1,8],['B','Granada','Gran.',4,2],['M','Morteiro','Mort.',1,6],['F','Bandeira','Band.',1,60]];
 const INFO={},INITC={};R.forEach(([k,n,s,c,v])=>{INFO[k]={n,s,c,v};INITC[k]=c});
 const ORDER=R.map(x=>x[0]);const V=k=>INFO[k].v;const TOTAL=R.reduce((a,x)=>a+x[3],0);
 const ROWS=9,COLS=10,MAPR=963/941;
