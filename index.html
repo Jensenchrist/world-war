@@ -405,12 +405,19 @@ body.desk .hint{font-size:16px}
 #brasasv{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:997;pointer-events:none;mix-blend-mode:screen;display:none;opacity:.95}
 body.sp #brasasv{display:block}
 @media (prefers-reduced-motion:reduce){#brasasv{display:none!important}}
+
+.cover.wide{display:none}
+body.desk .cover:not(.wide){display:none}
+body.desk .cover.wide{display:block;width:min(94vw,calc((100vh - 110px)*1672/941))!important}
+body.desk .toprow{width:min(94vw,calc((100vh - 110px)*1672/941))}
+body.desk #home.on{justify-content:center}
 </style>
 </head>
 <body>
 <div class="app">
 <section id="home" class="screen on">
   <div class="toprow"><button class="rulesbtn" data-act="rules">Como jogar</button><button class="icon snd" data-act="sound" aria-label="Som"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor" stroke="none"/><path class="w1" d="M16 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M18.5 7a7 7 0 0 1 0 10"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></button></div>
+  <div class="cover wide"><img src="capa169.webp" alt="World War — escolha sua nação"><button class="hot" data-nat="bra" aria-label="bra" style="left:6.58%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="us" aria-label="us" style="left:14.56%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="ar" aria-label="ar" style="left:22.54%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="fr" aria-label="fr" style="left:30.51%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="de" aria-label="de" style="left:38.49%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="ru" aria-label="ru" style="left:46.47%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="jp" aria-label="jp" style="left:54.45%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="cn" aria-label="cn" style="left:62.43%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="nl" aria-label="nl" style="left:70.41%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="it" aria-label="it" style="left:78.39%;top:83.95%;width:7.18%;height:11.90%"></button><button class="hot" data-nat="uk" aria-label="uk" style="left:86.36%;top:83.95%;width:7.18%;height:11.90%"></button></div>
   <div class="cover"><img src="capa.webp" alt="World War — escolha sua nação"><button class="hot" data-nat="bra" aria-label="bra" style="left:10.70%;top:79.50%;width:13.86%;height:7.28%"></button><button class="hot" data-nat="us" aria-label="us" style="left:26.86%;top:79.50%;width:14.08%;height:7.28%"></button><button class="hot" data-nat="ar" aria-label="ar" style="left:43.23%;top:79.50%;width:13.86%;height:7.28%"></button><button class="hot" data-nat="fr" aria-label="fr" style="left:59.50%;top:79.50%;width:13.65%;height:7.28%"></button><button class="hot" data-nat="de" aria-label="de" style="left:75.55%;top:79.50%;width:13.76%;height:7.28%"></button><button class="hot" data-nat="ru" aria-label="ru" style="left:4.91%;top:87.83%;width:13.65%;height:7.11%"></button><button class="hot" data-nat="jp" aria-label="jp" style="left:20.20%;top:87.83%;width:13.65%;height:7.11%"></button><button class="hot" data-nat="cn" aria-label="cn" style="left:35.48%;top:87.83%;width:13.65%;height:7.11%"></button><button class="hot" data-nat="nl" aria-label="nl" style="left:50.76%;top:87.83%;width:13.65%;height:7.11%"></button><button class="hot" data-nat="it" aria-label="it" style="left:66.05%;top:87.83%;width:13.65%;height:7.11%"></button><button class="hot" data-nat="uk" aria-label="uk" style="left:81.44%;top:87.83%;width:13.65%;height:7.11%"></button></div>
 </section>
 
