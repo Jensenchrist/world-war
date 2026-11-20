@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="World War">
 <meta name="theme-color" content="#0d120a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Anton&family=Oswald:wght@500;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Courier+Prime:wght@400;700&family=Anton&family=Oswald:wght@500;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 /* VOICE: jogo de estratégia premium de celular, clima de Segunda Guerra
    IDEA: mesa de campanha — o mapa pintado do jogador e cartas de soldados em pergaminho
@@ -402,7 +402,7 @@ body.desk #clash .cfbg{width:calc(100vh*941/1672);left:50%}
 body.desk .cl .duel .tok{width:min(26vh,240px)!important}
 body.desk .hint{font-size:16px}
 #sparks{display:none!important}
-#brasasv{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:997;pointer-events:none;mix-blend-mode:screen;display:none;opacity:.95}
+#brasasv{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:24;pointer-events:none;mix-blend-mode:screen;display:none;opacity:.95}
 body.sp #brasasv{display:block}
 @media (prefers-reduced-motion:reduce){#brasasv{display:none!important}}
 
@@ -411,6 +411,37 @@ body.desk .cover:not(.wide){display:none}
 body.desk .cover.wide{display:block;width:min(94vw,calc((100vh - 110px)*1672/941))!important}
 body.desk .toprow{width:min(94vw,calc((100vh - 110px)*1672/941))}
 body.desk #home.on{justify-content:center}
+
+#gamePanel{flex-wrap:wrap}#bonus{display:flex;gap:6px;order:-1;width:100%}#bonus:empty{display:none}#bonus .bon{flex:1;justify-content:center}
+body.desk #bonus{order:0;width:auto}
+.bon{flex:none;min-height:46px;border:0;padding:0 10px;display:flex;align-items:center;gap:6px;font:700 14px Oswald,sans-serif;text-transform:uppercase;color:#1d1405;cursor:pointer;
+ background:linear-gradient(#f3d27e,#a8772a);clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px);animation:pulse 1.2s ease-in-out infinite}
+.bon svg{width:24px;height:24px}
+.plane{position:absolute;z-index:40;width:calc(var(--cw)*2.2);height:calc(var(--cw)*2.2);margin:calc(var(--cw)*-1.1) 0 0 calc(var(--cw)*-1.1);color:#2b2f22;transform:rotate(90deg);filter:drop-shadow(0 0 2px #000);pointer-events:none}
+.plane.en{transform:rotate(-90deg)}
+.plane svg{width:100%;height:100%}
+.planeshadow{position:absolute;z-index:39;width:calc(var(--cw)*1.8);height:calc(var(--cw)*.5);margin-left:calc(var(--cw)*-.9);border-radius:50%;background:rgba(0,0,0,.35);filter:blur(4px);pointer-events:none}
+.plusrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:8px}
+.face{display:inline-block;flex:none;background-repeat:no-repeat;aspect-ratio:4/5;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
+.face.sm{width:40px}
+.face.big{width:100%;height:100%;border-radius:2px;box-shadow:none}
+.sname{font:600 13px Oswald,sans-serif;color:#e8c777;letter-spacing:.3px}
+.carlog{list-style:none;padding:0;margin:6px 0;width:100%;display:grid;gap:6px;text-align:left}
+.carlog li{display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.45);padding:6px 10px;border-radius:6px;font:500 14px Oswald,sans-serif;color:#efe6c4}
+.carlog li.dead{color:#e9a99a}.carlog li.dead .face{filter:grayscale(1)}
+.ficha{position:relative;width:100%;max-width:440px;margin:0 auto;aspect-ratio:683/1024;background:center/100% 100% no-repeat;color:#2b2013;font-family:'Courier Prime','Courier New',monospace}
+.ficha .fl{position:absolute;font-size:clamp(9px,2.6vw,13.5px);line-height:1.35;transform:translateY(-100%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:3px 0 1px}
+.ficha .fl b{font-weight:700}
+.ficha .fl em{font-style:normal;font-weight:700;opacity:.75;text-transform:uppercase;font-size:.85em}
+.fphoto{position:absolute;left:60.8%;top:10%;width:35.2%;height:36.2%;overflow:hidden;filter:sepia(.35) contrast(1.05)}
+.fphoto .stamp{position:absolute;left:-10%;right:-10%;top:42%;transform:rotate(-18deg);text-align:center;font:400 clamp(12px,3.4vw,18px) 'Courier Prime',monospace;color:#a51c12;border:2px solid #a51c12;padding:2px;background:rgba(255,240,220,.15);text-transform:uppercase}
+.fnum{position:absolute;left:69.5%;top:2.6%;width:23%;text-align:center;font-size:clamp(10px,2.8vw,14px)}
+.frank{position:absolute;left:75%;top:49.7%;width:20%;text-align:center;font-size:clamp(9px,2.4vw,12.5px);text-transform:uppercase}
+.qlist{display:grid;gap:6px}
+.qrow{display:flex;align-items:center;gap:10px;border:0;width:100%;text-align:left;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.4);color:#efe6c4;cursor:pointer}
+.qrow b{display:block;font:600 15px Oswald,sans-serif}.qrow small{font:500 12px Oswald,sans-serif;color:#a7b08a;text-transform:uppercase;letter-spacing:.4px}
+.qrow em{margin-left:auto;color:#d9b25a;font-style:normal;font-weight:800}
+.qrow.dead{opacity:.75}.qrow.dead .face{filter:grayscale(1)}
 </style>
 </head>
 <body>
@@ -424,6 +455,7 @@ body.desk #home.on{justify-content:center}
 <section id="campaign" class="screen">
   <div class="bar"><button class="icon" data-act="home" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>Campanha</h2><span class="pill s" id="campPill"></span></div>
   <button class="lv me" data-act="nat" id="meNat"></button>
+  <div class="plusrow"><button class="lv" data-act="plus" id="plusBtn"></button><button class="lv" data-act="quartel" id="quartelBtn"><span><b>Quartel</b><span>Fichas e caídos</span></span></button></div>
   <p class="tag" style="margin:10px 2px 6px">Derrote os 10 exércitos, um de cada vez. Cada fase é mais difícil: o inimigo erra menos e lembra por mais tempo das cartas que já viu.</p>
   <div class="camp" id="camp"></div>
 </section>
@@ -444,6 +476,7 @@ body.desk #home.on{justify-content:center}
   <button class="kills" id="killsP" data-act="tropas" aria-label="Suas baixas" style="margin:8px 0 0"></button>
   <div id="gamePanel">
     <div id="msg" aria-live="polite"></div>
+    <div id="bonus"></div>
     <button class="tropas" data-act="tropas" aria-label="Ver tropas"><img src="pecas/verso.webp" alt="">Tropas</button>
   </div>
 </section>
@@ -558,7 +591,11 @@ function doMove(fr,fc,tr,tc){
   else if(res==='a')txt=`${an} (${a.k}) derrotou ${dn} (${d.k}).`;
   else if(res==='d')txt=`${an} (${a.k}) perdeu para ${dn} (${d.k}).`;
   else txt=`${an} e ${dn} (${a.k}) se eliminaram.`;
-  return{a:{k:a.k,side:a.side},d:{k:d.k,side:d.side},res,txt,flag:d.k==='F'&&res==='a',side:a.side};
+  let bt='';
+  if(res==='a'||res==='both')bt+=onKill(a,d);
+  if(res==='d'||res==='both')bt+=onKill(d,a);
+  txt+=bt;
+  return{a:{k:a.k,side:a.side,sid:a.sid},d:{k:d.k,side:d.side,sid:d.sid},res,txt,flag:d.k==='F'&&res==='a',side:a.side};
 }
 
 /* ---------- IA ---------- */
@@ -630,7 +667,7 @@ function tok(k,side,show,extra=''){
 
 /* ---------- som ---------- */
 let soundOn=store.get('cb_sound')!==false,AC=null,lastFlag=false;
-const VOLDEF={music:.4,amb_aviao:.6,amb_batalha:.6,amb_tanque:.6,amb_mg:.6,amb_canhao:.6,step:1,shot:1,mg:1,boom:1,mortar:1,fanfare:1};
+const VOLDEF={music:.4,amb_aviao:.6,amb_batalha:.6,amb_tanque:.6,amb_mg:.6,amb_canhao:.6,step:1,shot:1,mg:1,boom:1,mortar:1,plane:1,arty:1,fanfare:1};
 const VOL={...VOLDEF,...(store.get('cb_vol')||{})};delete VOL.amb;const BUS={};
 function bus(c){if(!BUS[c]){BUS[c]=AC.createGain();BUS[c].connect(AC.destination)}BUS[c].gain.value=VOL[c];return BUS[c]}
 function ensureAudio(){{const v=$('brasasv');if(document.body.classList.contains('sp')&&v.paused)v.play().catch(()=>{})}
@@ -765,6 +802,7 @@ function progress(){return store.get('cb_camp_'+NAT)||{done:0}}
 function campaign(){
   phase='camp';show('campaign');const pr=progress();
   $('campPill').textContent=pr.done+'/10';
+  $('plusBtn').innerHTML=`<span><b>Modo Plus</b><span>Carreira dos soldados</span></span><em class="st">${PLUS?'Ligado':'Desligado'}</em>`;$('plusBtn').classList.toggle('next',PLUS);$('quartelBtn').style.display=PLUS?'':'none';
   $('meNat').innerHTML=`<i class="flag" style="background:${FLAGS[NATIONS[NAT].c]}"></i><span><b>${NATIONS[NAT].n}</b><span>Seu exército</span></span><em class="st">Trocar</em>`;
   $('camp').innerHTML=LEVELS.map((L,i)=>{const lock=i>pr.done,done=i<pr.done;
     return `<button class="lv${i===pr.done?' next':''}${lock?' lock':''}" ${lock?'disabled':`data-lv="${i}"`}><i class="flag" style="background:${FLAGS[L.c]}"></i><span><b>${L.n}</b><span>Fase ${i+1} · ${L.d}</span></span><em class="st">${done?'Vencida':lock?'Bloqueada':'Jogar'}</em></button>`}).join('');
@@ -794,7 +832,8 @@ const placed=()=>TOTAL-Object.values(tray).reduce((a,b)=>a+b,0);
 function startBattle(){
   const g={};for(let r=6;r<ROWS;r++)for(let c=0;c<COLS;c++)if(board[r][c])g[r*10+c]=board[r][c].k;
   store.set('cb_form3',g);
-  phase='play';sel=null;selType=null;last=[];rep={};
+  phase='play';sel=null;selType=null;last=[];rep={};strike=null;bonus={p:{plane:0,arty:0},a:{plane:0,arty:0}};
+  if(PLUS)careerStart();
   say(`Batalha contra ${LV.n}! Depois de cada confronto as cartas viram de novo: memorize o que viu.`);
   render();layout();
 }
@@ -815,6 +854,11 @@ function tapSetup(r,c){
 function tapPlay(r,c){
   if(busy||phase!=='play'||isLake(r,c))return;
   const p=board[r][c];
+  if(strike){
+    if(strike==='plane'){if(rowTargets('a',r).length)return playerStrike('plane',r,c);}
+    else if(p&&p.side==='a'&&p.k!=='F')return playerStrike('arty',r,c);
+    strike=null;say('Ataque cancelado.');render();return;
+  }
   if(aiming){
     if(p&&p.side==='a')return playerMortar(aiming[0],aiming[1],r,c);
     aiming=null;say('Disparo cancelado.');if(!(p&&p.side==='p'&&p.k==='M')){render();return}
@@ -868,8 +912,8 @@ async function fireMortar(fr,fc,tr,tc){
   if(cell){const c=cell.querySelector('.tok');if(c)c.animate([{filter:'brightness(3) sepia(1)',transform:'scale(1.15)'},{filter:'brightness(.2)',transform:'scale(.6) rotate(18deg)',opacity:0}],{duration:650,fill:'forwards',easing:'ease-in'})}
   await wait(700);
   const who=mine?'Seu morteiro':'O morteiro inimigo';
-  board[tr][tc]=null;dead[t.side].push(t.k);
-  const txt=t.k==='F'?`${who} destruiu a bandeira ${t.side==='a'?'inimiga':'sua'}!`:`${who} destruiu ${t.k==='B'?(t.side==='p'?'sua':'a'):(t.side==='p'?'seu':'o')} ${INFO[t.k].n}${t.side==='a'?(t.k==='B'?' inimiga':' inimigo'):''}${t.k==='B'||t.k==='M'?'':` (${t.k})`}.`;
+  board[tr][tc]=null;dead[t.side].push(t.k);const bt=onKill({side},t);
+  const txt=t.k==='F'?`${who} destruiu a bandeira ${t.side==='a'?'inimiga':'sua'}!`:`${who} destruiu ${t.k==='B'?(t.side==='p'?'sua':'a'):(t.side==='p'?'seu':'o')} ${INFO[t.k].n}${t.side==='a'?(t.k==='B'?' inimiga':' inimigo'):''}${t.k==='B'||t.k==='M'?'':` (${t.k})`}.`+bt;
   scorch(tr,tc);
   render();return txt;
 }
@@ -884,6 +928,11 @@ function aiMortar(){
 }
 async function aiTurnRun(pre=''){
   render();
+  const st=aiStrike();
+  if(st){aiTurn++;const [type,r,c]=st;say(type==='plane'?'Um bombardeiro inimigo se aproxima!':'A artilharia inimiga abriu fogo!');
+    const txt=type==='plane'?await planeRun('a',r):await artyRun('a',r,c);bonus.a[type]--;busy=false;
+    if(!canMove('p'))return finish(false,'Você ficou sem cartas que se movem.');
+    say(pre+txt+' Sua vez.');render();return}
   const mt=aiMortar();
   if(mt){aiTurn++;say('O inimigo disparou o morteiro!');const txt=await fireMortar(...mt);busy=false;
     if(!board.flat().some(p=>p&&p.side==='p'&&p.k==='F'))return finish(false,txt);
@@ -898,6 +947,208 @@ async function aiTurnRun(pre=''){
   if(checkEnd('a',e2))return;
   say(pre+(e2?e2.txt+' Sua vez.':'O inimigo moveu uma carta. Sua vez.'));render();
 }
+/* ===================== AVIÃO E ARTILHARIA ===================== */
+let strike=null,bonus={p:{plane:0,arty:0},a:{plane:0,arty:0}};
+function onKill(killer,victim){
+  let t='';
+  if(victim.k==='9'){bonus[killer.side].plane++;t+=killer.side==='p'?' Você ganhou um avião bombardeiro!':' O inimigo ganhou um avião bombardeiro!'}
+  if(victim.k==='10'){bonus[killer.side].arty++;t+=killer.side==='p'?' Você ganhou a artilharia!':' O inimigo ganhou a artilharia!'}
+  if(PLUS)careerKill(killer,victim);
+  return t;
+}
+const rowTargets=(side,r)=>{const o=[];for(let c=0;c<COLS;c++){const p=board[r][c];if(p&&p.side===side&&p.k!=='F')o.push([r,c])}return o};
+function renderBonus(){
+  const b=bonus.p,el=$('bonus');if(!el)return;
+  el.innerHTML=(b.plane?`<button class="bon" data-act="useplane">${PLANE_SVG}<span>Avião${b.plane>1?' ×'+b.plane:''}</span></button>`:'')+
+    (b.arty?`<button class="bon" data-act="usearty">${ARTY_SVG}<span>Artilharia${b.arty>1?' ×'+b.arty:''}</span></button>`:'')+
+    (PLUS&&sel&&board[sel[0]][sel[1]]&&board[sel[0]][sel[1]].sid!=null?`<button class="bon" data-act="selficha"><span>Ficha</span></button>`:'');
+}
+const PLANE_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c2 0 3 3 3 7v12l24 9v5l-24-4v15l7 5v4l-10-3-10 3v-4l7-5V33L5 37v-5l24-9V11c0-4 1-7 3-7z" fill="currentColor"/></svg>';
+const ARTY_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 44l30-26 5 5-30 26z M30 40a10 10 0 1 0 0.1 0z M14 52h34v5H14z" fill="currentColor"/></svg>';
+function blastFx(tr,tc,cat){
+  const g=$('grid'),[x1,y1]=cellXY(tr,tc),t=board[tr][tc];
+  const cell=g.querySelector(`[data-i="${tr*10+tc}"]`);
+  if(cell&&t)cell.innerHTML=tok(t.k,t.side,true,'pop');
+  if(has('explosao')){play('explosao',cat,{vol:.9,rate:.95+Math.random()*.1});duck(2000)}else mortarBoom();
+  const fl=document.createElement('div');fl.className='flashfull';document.body.appendChild(fl);setTimeout(()=>fl.remove(),450);
+  for(const [cls,ms] of [['blast',800],['blast b2',1000],['smokeball',1600],['ring',700]]){const e=document.createElement('div');e.className=cls;e.style.left=x1+'px';e.style.top=y1+'px';g.appendChild(e);setTimeout(()=>e.remove(),ms)}
+  for(let i=0;i<20;i++){const d=document.createElement('div');d.className='debris';d.style.left=x1+'px';d.style.top=y1+'px';g.appendChild(d);
+    const a=Math.random()*6.28,r=40+Math.random()*80;d.animate([{transform:'translate(0,0) scale(1.4)',opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r-30}px) scale(.4)`,opacity:0}],{duration:700+Math.random()*400,easing:'cubic-bezier(.2,.8,.4,1)'}).onfinish=()=>d.remove()}
+  $('stage').classList.remove('shake');void $('stage').offsetWidth;$('stage').classList.add('shake');
+  if(cell){const c=cell.querySelector('.tok');if(c)c.animate([{filter:'brightness(3) sepia(1)',transform:'scale(1.15)'},{filter:'brightness(.2)',transform:'scale(.6) rotate(18deg)',opacity:0}],{duration:650,fill:'forwards',easing:'ease-in'})}
+}
+function killAt(r,c,side,why){
+  const t=board[r][c];if(!t)return '';
+  board[r][c]=null;dead[t.side].push(t.k);scorch(r,c);
+  const extra=onKill({side},t);
+  const mine=t.side==='p',fem=t.k==='B';
+  return `${why} derrubou ${mine?(fem?'sua':'seu'):(fem?'a':'o')} ${INFO[t.k].n}${mine?'':(fem?' inimiga':' inimigo')}${PLUS&&t.sid!=null?' '+shortName(t.sid):''}.${extra}`;
+}
+async function planeRun(side,r){
+  const g=$('grid'),opp=side==='p'?'a':'p',[,y]=cellXY(r,0),cw=g.clientWidth/COLS;
+  const pl=document.createElement('div');pl.className='plane'+(side==='a'?' en':'');pl.innerHTML=PLANE_SVG;pl.style.top=y+'px';g.appendChild(pl);
+  const sh=document.createElement('div');sh.className='planeshadow';sh.style.top=(y+cw*.5)+'px';g.appendChild(sh);
+  if(has('amb_aviao'))play('amb_aviao','plane',{dur:2.6,fadeIn:.25,fadeOut:.9,vol:1,offset:8});
+  const x0=side==='p'?-cw*1.5:g.clientWidth+cw*1.5,x1=side==='p'?g.clientWidth+cw*1.5:-cw*1.5,dur=2200;
+  const tg=rowTargets(opp,r),pick=tg[Math.random()*tg.length|0];let txt='';
+  await new Promise(res=>{const t0=performance.now();let dropped=false;(function f(now){const p=Math.min(1,(now-t0)/dur),x=x0+(x1-x0)*p;
+    pl.style.left=x+'px';sh.style.left=(x+cw*.4)+'px';
+    if(!dropped&&pick){const [px]=cellXY(...pick);if((side==='p'&&x>=px-cw*.6)||(side==='a'&&x<=px+cw*.6)){dropped=true;blastFx(pick[0],pick[1],'plane');setTimeout(()=>{txt=killAt(pick[0],pick[1],side,side==='p'?'Seu bombardeiro':'O bombardeiro inimigo');render()},650)}}
+    p<1?requestAnimationFrame(f):res()})(t0)});
+  pl.remove();sh.remove();await wait(300);
+  return txt||'O bombardeiro passou sem acertar nada.';
+}
+async function artyRun(side,r,c){
+  const opp=side==='p'?'a':'p';
+  if(has('canhao2'))play('canhao2','arty',{vol:.9});
+  await wait(500);sfxWhistle(.7);await wait(700);
+  blastFx(r,c,'arty');await wait(650);
+  let txt=killAt(r,c,side,side==='p'?'Sua artilharia':'A artilharia inimiga');render();
+  const nb=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const rr=r+dr,cc=c+dc;if(inB(rr,cc)&&board[rr][cc]&&board[rr][cc].side===opp&&board[rr][cc].k!=='F')nb.push([rr,cc])}
+  if(nb.length){const [rr,cc]=nb[Math.random()*nb.length|0];if(has('canhao4'))play('canhao4','arty',{vol:.7});await wait(450);blastFx(rr,cc,'arty');await wait(650);txt+=' '+killAt(rr,cc,side,'O segundo disparo');render()}
+  return txt;
+}
+async function playerStrike(type,r,c){
+  busy=true;strike=null;sel=null;render();
+  const txt=type==='plane'?await planeRun('p',r):await artyRun('p',r,c);
+  bonus.p[type]--;say(txt);render();
+  if(!canMove('a'))return finish(true,'O inimigo ficou sem cartas que se movem.');
+  await wait(900);await aiTurnRun(txt+' ');
+}
+function aiStrike(){
+  if(bonus.a.arty){let best=null,bv=-1;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=board[r][c];if(!p||p.side!=='p'||p.k==='F')continue;const v=(known(p)?V(p.k):2)+(p.moved?1:0)+Math.random();if(v>bv){bv=v;best=[r,c]}}if(best)return['arty',...best]}
+  if(bonus.a.plane){let best=null,bv=-1;for(let r=0;r<ROWS;r++){const t=rowTargets('p',r);if(!t.length)continue;let v=0;for(const [rr,cc] of t){const p=board[rr][cc];v+=known(p)?V(p.k):3}v+=Math.random();if(v>bv){bv=v;best=r}}if(best!=null)return['plane',best,0]}
+  return null;
+}
+
+/* ===================== MODO PLUS: CARREIRA ===================== */
+let PLUS=store.get('cb_plus')===true,ARMY={},SOLD=new Map();
+const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const dstr=d=>`${MES[d.m-1]}/${d.y}`;
+const addM=(d,n)=>{let m=d.m-1+n;return{y:d.y+Math.floor(m/12),m:(m%12+12)%12+1}};
+const FACES={bra:32,us:32,ar:32,fr:32,de:16,ru:32,jp:32,cn:32,nl:32,it:32,uk:32};
+const NAMES={
+ bra:['João José Antônio Francisco Pedro Sebastião Manoel Benedito Raimundo Luiz Geraldo Joaquim','Silva Santos Oliveira Souza Pereira Costa Rodrigues Almeida Nascimento Lima Carvalho Barbosa'],
+ us:['John William James Robert Charles George Frank Joseph Edward Harold Walter Henry','Smith Johnson Miller Davis Wilson Anderson Taylor Moore Jackson White Harris Clark'],
+ ar:['Juan Carlos Jorge Luis Miguel Héctor Raúl Alberto Ernesto Ricardo Oscar Rubén','González Rodríguez Fernández López Martínez Pérez Gómez Díaz Sosa Romero Álvarez Ruiz'],
+ fr:['Jean Pierre Louis André Marcel René Henri Georges Paul Lucien Émile Robert','Martin Bernard Dubois Durand Leroy Moreau Lefèvre Girard Fournier Mercier Rousseau Blanc'],
+ de:['Hans Karl Heinz Werner Fritz Otto Ernst Walter Kurt Friedrich Helmut Günter','Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Hoffmann Koch Richter Wolf'],
+ ru:['Ivan Aleksei Dmitri Nikolai Sergei Mikhail Pavel Vasili Yuri Grigori Boris Fyodor','Ivanov Smirnov Kuznetsov Popov Sokolov Lebedev Kozlov Novikov Morozov Petrov Volkov Orlov'],
+ jp:['Hiroshi Takeshi Kenji Saburo Ichiro Jiro Masao Yoshio Tadashi Shigeru Haruo Isamu','Sato Suzuki Takahashi Tanaka Watanabe Ito Yamamoto Nakamura Kobayashi Kato Yoshida Yamada'],
+ cn:['Wei Ming Jun Hao Lei Jian Qiang Bo Feng Gang Tao Hua','Wang Li Zhang Liu Chen Yang Huang Zhao Wu Zhou Xu Sun'],
+ nl:['Jan Pieter Willem Hendrik Cornelis Johannes Gerrit Dirk Kees Hans Bram Joost','de_Jong Jansen de_Vries van_den_Berg Bakker Visser Smit Meijer Mulder de_Boer Bos Vos'],
+ it:['Giuseppe Giovanni Antonio Mario Luigi Francesco Angelo Vincenzo Pietro Salvatore Carlo Bruno','Rossi Russo Ferrari Esposito Bianchi Romano Colombo Ricci Marino Greco Gallo Conti'],
+ uk:['Arthur Albert Thomas Harry Alfred Frederick Ernest Sidney Stanley Leonard Reginald Percy','Smith Jones Williams Brown Taylor Davies Evans Roberts Walker Wright Hughes Green']};
+const CITIES={bra:'Rio de Janeiro|São Paulo|Belo Horizonte|Recife|Porto Alegre|Salvador|Curitiba|Juiz de Fora',us:'Chicago|Boston|Ohio|Texas|Brooklyn|Iowa|Filadélfia|Detroit',ar:'Buenos Aires|Córdoba|Rosario|Mendoza|La Plata|Tucumán',fr:'Paris|Lyon|Marselha|Bordeaux|Lille|Toulouse',de:'Hamburgo|Munique|Colônia|Dresden|Frankfurt|Stuttgart',ru:'Moscou|Leningrado|Kiev|Stalingrado|Kazan|Novosibirsk',jp:'Tóquio|Osaka|Kyoto|Nagoya|Sendai|Fukuoka',cn:'Xangai|Nanquim|Chongqing|Cantão|Wuhan|Changsha',nl:'Amsterdã|Roterdã|Haia|Utrecht|Groningen|Eindhoven',it:'Roma|Milão|Nápoles|Turim|Florença|Palermo',uk:'Londres|Manchester|Liverpool|Glasgow|Birmingham|Leeds'};
+const TRAITS=['cicatriz no queixo','sardas no rosto','míope, usa óculos','canhoto','bigode espesso','nariz quebrado','sobrancelhas grossas','olhos claros','fala pouco','fumante inveterado','assobia em marcha','tatuagem no braço','orelhas de abano','dente de ouro'];
+const FUNC={'1':'Agente secreto','2':'Fuzileiro e batedor','3':'Sapador (desarma minas)','4':'Sargento de pelotão','5':'Comandante de pelotão','6':'Comandante de companhia','7':'Comandante de batalhão','8':'Comandante de regimento','9':'Comandante de divisão','10':'Comandante do exército'};
+const SURFIRST={jp:1,cn:1};
+const RANKS_S=['1','2','3','4','5','6','7','8','9','10'];
+const pick=a=>a[Math.random()*a.length|0];
+function newSoldier(army,nat,k,when,recruit){
+  const [F,L]=NAMES[nat].map(x=>x.split(' ').map(n=>n.replace(/_/g,' ')));
+  const f=pick(F),l=pick(L),name=SURFIRST[nat]?`${l} ${f}`:`${f} ${l}`;
+  const age=17+(recruit?Math.random()*4|0:Math.round(+k*2.6+Math.random()*6));
+  const enl=recruit?when:addM(when,-(Math.random()*30|0));
+  return{id:army.next++,name,k,face:(army.face++)%FACES[nat],born:when.y-age,enl,city:pick(CITIES[nat].split('|')),
+    h:(1.6+Math.random()*.25).toFixed(2).replace('.',','),trait:pick(TRAITS),unit:`${1+(Math.random()*12|0)}º Batalhão de Infantaria`,
+    serial:String(10000+(Math.random()*89999|0)),xp:0,kills:[],battles:0,fronts:[],medals:[],log:[],alive:true};
+}
+function getArmy(nat){
+  let a=store.get('cb_army_'+nat);
+  if(!a){a={nat,date:{y:1940,m:1},next:1,face:0,soldiers:[]};
+    for(const k of RANKS_S)for(let i=0;i<INITC[k];i++)a.soldiers.push(newSoldier(a,nat,k,a.date,false));
+    store.set('cb_army_'+nat,a)}
+  return a;
+}
+function careerStart(){
+  ARMY={p:getArmy(NAT),a:getArmy(LV.key)};SOLD=new Map();
+  for(const side of ['p','a']){const A=ARMY[side],pool={};
+    for(const s of A.soldiers)if(s.alive){(pool[s.k]=pool[s.k]||[]).push(s);s._b=null}
+    for(const k in pool)pool[k].sort((x,y)=>y.xp-x.xp);
+    for(const row of board)for(const p of row)if(p&&p.side===side&&RANKS_S.includes(p.k)){
+      let s=(pool[p.k]||[]).shift();if(!s){s=newSoldier(A,A.nat,p.k,A.date,true);A.soldiers.push(s)}
+      p.sid=A.nat+':'+s.id;s._b={kills:0,merit:false};SOLD.set(p.sid,s)}}
+}
+const nameOf=x=>PLUS&&x.sid!=null&&SOLD.get(x.sid)?`<br><small class="sname">${SOLD.get(x.sid).name}</small>`:'';
+const shortName=sid=>{const s=SOLD.get(sid);return s?s.name:''};
+function careerKill(killer,victim){
+  const A=killer.side==='p'?ARMY.p:ARMY.a,V2=victim.side==='p'?ARMY.p:ARMY.a;if(!A||!V2)return;
+  const vs=victim.sid!=null?SOLD.get(victim.sid):null,ks=killer.sid!=null?SOLD.get(killer.sid):null;
+  if(ks){ks.xp+=V(victim.k);ks._b.kills++;if(RANKS_S.includes(victim.k)&&+victim.k>+ks.k)ks._b.merit=true;
+    ks.kills.push({k:victim.k,nat:V2.nat,name:vs?vs.name:null,d:A.date});}
+  if(vs&&vs.alive){vs.alive=false;vs.died=V2.date;vs.by=ks?`${INFO[ks.k].n} ${ks.name} (${NATIONS[A.nat].n})`:(killer.k==='B'?'uma granada':'fogo inimigo')}
+}
+function reorg(A,date,log){
+  const alive=k=>A.soldiers.filter(s=>s.alive&&s.k===k);
+  const promote=()=>{for(let r=10;r>=3;r--){const k=String(r),below=String(r-1);let need=INITC[k]-alive(k).length;
+    while(need>0){const c=alive(below).sort((x,y)=>(y._m?1:0)-(x._m?1:0)||y.xp-x.xp)[0];if(!c)break;
+      c.log.push(`${dstr(date)}: promovido a ${INFO[k].n}`);log.push({s:c,from:below,to:k});c.k=k;need--}}};
+  promote();
+  for(const k of ['2','1']){let need=INITC[k]-alive(k).length;while(need-->0){const s=newSoldier(A,A.nat,k,date,true);s.log.push(`${dstr(date)}: alistado`);A.soldiers.push(s);log.push({s,rec:true})}}
+  promote();
+  for(const k of RANKS_S){let need=INITC[k]-alive(k).length;while(need-->0){const s=newSoldier(A,A.nat,k,date,true);A.soldiers.push(s)}}
+}
+function careerEnd(win){
+  const out={promo:[],fallen:[],rec:0};
+  for(const side of ['p','a']){const A=ARMY[side],opp=ARMY[side==='p'?'a':'p'],won=side==='p'?win:!win;
+    for(const s of A.soldiers){if(!s._b)continue;
+      s.battles++;s.fronts.push(`${NATIONS[opp.nat].n} (${dstr(A.date)})`);
+      s._m=s._b.merit;
+      if(s.alive&&s._b.kills>=2)s.medals.push('Cruz de Combate');
+      if(s.alive&&s.kills.some(x=>x.d===A.date&&(x.k==='9'||x.k==='10')))s.medals.push('Medalha de Bravura');
+      if(s.alive&&won)s.log.push(`${dstr(A.date)}: vitória contra ${NATIONS[opp.nat].n}`);
+      if(!s.alive&&s.died===A.date&&side==='p')out.fallen.push(s);
+      delete s._b}
+    const log=[];reorg(A,addM(A.date,4),log);
+    for(const s of A.soldiers)delete s._m;
+    if(side==='p'){out.promo=log.filter(x=>!x.rec);out.rec=log.filter(x=>x.rec).length}
+    A.date=addM(A.date,4);store.set('cb_army_'+A.nat,A)}
+  return out;
+}
+function careerSummary(c){
+  const li=[];
+  for(const p of c.promo.slice(0,6))li.push(`<li>${face(NAT,p.s.face,'sm')}<span><b>${p.s.name}</b> promovido a ${INFO[p.to].n}</span></li>`);
+  for(const s of c.fallen.slice(0,6))li.push(`<li class="dead">${face(NAT,s.face,'sm')}<span><b>${s.name}</b> (${INFO[s.k].n}) morto em combate</span></li>`);
+  if(c.rec)li.push(`<li><span>${c.rec} recrutas se alistaram para repor as baixas.</span></li>`);
+  return li.length?`<ul class="carlog">${li.join('')}</ul>`:'';
+}
+function face(nat,i,cls=''){const rows=Math.ceil(FACES[nat]/8),c=i%8,r=Math.floor(i/8);
+  return `<i class="face ${cls}" style="background-image:url(rostos/${nat}.webp);background-size:800% ${rows*100}%;background-position:${c/7*100}% ${rows>1?r/(rows-1)*100:0}%"></i>`}
+function findSoldier(sid){const [nat,id]=String(sid).split(':');const A=(ARMY.p&&ARMY.p.nat===nat)?ARMY.p:(ARMY.a&&ARMY.a.nat===nat)?ARMY.a:getArmy(nat);
+  const s=A.soldiers.find(x=>x.id===+id);return s?{s,nat}:null}
+function fichaSheet(s,nat){
+  const L=(y,x,html,w)=>`<div class="fl" style="top:${y}%;left:${x}%;width:${w}%">${html}</div>`;
+  const kills=s.kills.slice(-3).map(k=>`${INFO[k.k].s}${k.name?' '+k.name:''} (${NATIONS[k.nat].n})`).join('; ');
+  const status=s.alive?'Na ativa':`Morto em combate, ${dstr(s.died)}${s.by?' — por '+s.by:''}`;
+  sheet(`<div class="ficha" style="background-image:url(fichas/${nat}.webp)">
+    <div class="fphoto">${face(nat,s.face,'big')}${s.alive?'':'<span class="stamp">Morto em combate</span>'}</div>
+    <div class="fnum">Nº ${s.serial}</div><div class="frank">${INFO[s.k].n}</div>
+    ${L(6.2,36,`<em>Posto:</em> ${INFO[s.k].n}`,23)}
+    ${L(11.8,36,`<em>Nação:</em> ${NATIONS[nat].n}`,23)}
+    ${L(15.4,36,`<em>Alist.:</em> ${dstr(s.enl)}`,23)}
+    ${L(26.5,4,`<em>Nome:</em> <b>${s.name}</b>`,54)}
+    ${L(32.5,4,`<em>Unidade:</em> ${s.unit}`,54)}
+    ${L(38.1,4,`<em>Função:</em> ${FUNC[s.k]}`,54)}
+    ${L(43.6,4,`<em>Natural de:</em> ${s.city} · ${s.born}`,54)}
+    ${L(50.3,4,`<em>Altura:</em> ${s.h} m · ${s.trait}`,66)}
+    ${L(57.9,4,`<em>Batalhas:</em> ${s.battles} · <em>Abates:</em> ${s.kills.length} · <em>Pontos:</em> ${s.xp}`,66)}
+    ${L(65,4,`<em>Medalhas:</em> ${s.medals.length?[...new Set(s.medals)].map(m=>m+(s.medals.filter(x=>x===m).length>1?' ×'+s.medals.filter(x=>x===m).length:'')).join(', '):'—'}`,66)}
+    ${L(73.8,4,`<em>Frentes:</em> ${s.fronts.slice(-3).join(', ')||'—'}`,66)}
+    ${L(79.9,4,`<em>Abateu:</em> ${kills||'—'}`,66)}
+    ${L(86,4,`<em>Situação:</em> ${status}`,88)}
+    ${s.log.length?L(91.5,4,`<em>Histórico:</em> ${s.log.slice(-2).join(' · ')}`,88):''}
+  </div><button class="btn" data-act="close" style="width:100%;margin-top:12px">Fechar</button>`);
+}
+function quartelSheet(){
+  const A=getArmy(NAT),alive=A.soldiers.filter(s=>s.alive).sort((x,y)=>+y.k-+x.k||y.xp-x.xp),dead_=A.soldiers.filter(s=>!s.alive);
+  const row=s=>`<button class="qrow${s.alive?'':' dead'}" data-act="ficha" data-sid="${NAT}:${s.id}">${face(NAT,s.face,'sm')}<span><b>${s.name}</b><small>${INFO[s.k].n} · ${s.battles} batalhas · ${s.kills.length} abates</small></span>${s.medals.length?'<em>★'+s.medals.length+'</em>':''}</button>`;
+  sheet(`<h3>Quartel · ${NATIONS[NAT].n}</h3><p style="margin:0 0 8px;color:var(--mute)">Data atual: ${dstr(A.date)}</p>
+    <div class="lbl">NA ATIVA (${alive.length})</div><div class="qlist">${alive.map(row).join('')}</div>
+    <div class="lbl">MURAL DOS CAÍDOS (${dead_.length})</div><div class="qlist">${dead_.length?dead_.slice().reverse().map(row).join(''):'<p style="color:var(--mute)">Ninguém caiu ainda.</p>'}</div>
+    <button class="btn ghost" data-act="close" style="width:100%;margin-top:12px">Fechar</button>`);
+}
+
 async function playerMortar(fr,fc,tr,tc){
   busy=true;aiming=null;sel=null;
   const txt=await fireMortar(fr,fc,tr,tc);say(txt);
@@ -924,9 +1175,10 @@ function finish(win,why){
   const s=store.get('cb_rec')||{w:0,l:0};win?s.w++:s.l++;store.set('cb_rec',s);
   const pr=progress();if(win&&lvIdx===pr.done&&pr.done<10){pr.done++;store.set('cb_camp_'+NAT,pr)}
   const nx=win&&lvIdx<9?LEVELS[lvIdx+1]:null;
+  const car=PLUS&&ARMY.p?careerEnd(win):null;
   say((win?'<b>Vitória.</b> ':'<b>Derrota.</b> ')+why+' Todas as cartas foram reveladas.');render();
   const head=win?(lvIdx===9?'Campanha concluída!':`${LV.n} derrotado!`):'Derrota';
-  setTimeout(()=>endScreen(win,why,nx),700);
+  setTimeout(()=>endScreen(win,why,nx,car),700);
 }
 let clashDone=null;
 const CF={us:[297,438],ru:[298,445],jp:[293,443],fr:[239,369],de:[237,374],it:[309,450],cn:[287,423],uk:[220,344],nl:[282,422],bra:[306,440],ar:[282,420]};
@@ -942,7 +1194,7 @@ function clash(ev){
   const title=ev.flag?(pa?'Bandeira!':'Perdida!'):win===null?'Empate':win?'Vitória':'Derrota';
   const me=pa?ev.a:ev.d,foe=pa?ev.d:ev.a,meRole=pa?'a':'d',foeRole=pa?'d':'a';
   const lost=r=>ev.res==='both'||(ev.res==='a'&&r==='d')||(ev.res==='d'&&r==='a');
-  const side=(x,r,cls,who)=>`<div class="side ${cls} ${lost(r)?'lose':'win'}">${tok(x.k,x.side,true)}<span class="who">${who}</span><span class="tagp">${INFO[x.k].n}</span></div>`;
+  const side=(x,r,cls,who)=>`<div class="side ${cls} ${lost(r)?'lose':'win'}">${tok(x.k,x.side,true)}<span class="who">${who}${nameOf(x)}</span><span class="tagp">${INFO[x.k].n}</span></div>`;
   const fl=win===false?flagOf('a'):flagOf('p');
   const wk=win===false?LV.key:NAT,cf=CF[wk];
   if(cf){const t=cf[0]/16.72,b=cf[1]/16.72;
@@ -958,7 +1210,7 @@ function clash(ev){
   $('clash').classList.add('on');sfxClash(ev);
   return new Promise(res=>{const done=()=>{if(!clashDone)return;clashDone=null;$('clash').classList.remove('on');res()};clashDone=done;setTimeout(done,2300)});
 }
-function endScreen(win,why,nx){
+function endScreen(win,why,nx,car){
   const W=win?{k:NAT,c:NATIONS[NAT].c}:{k:LV.key,c:LV.c},L=win?{k:LV.key,c:LV.c}:{k:NAT,c:NATIONS[NAT].c};
   const camp=win&&lvIdx===9;
   $('endscr').innerHTML=`<div class="es">${WREATH()}<div class="wings"><h2 class="bigt">Vitória</h2></div>
@@ -966,7 +1218,7 @@ function endScreen(win,why,nx){
    <div class="eshero"></div>
    <div class="ribbon">Derrota</div>
    <div class="nplate dim"><i style="background:${FLAGS[L.c]}"></i>Exército ${ADJ[L.k]}</div>
-   <p class="eswhy">${camp?'Campanha concluída! ':''}${why}${nx?` Próxima fase: ${nx.n}.`:''}</p>
+   <p class="eswhy">${camp?'Campanha concluída! ':''}${why}${nx?` Próxima fase: ${nx.n}.`:''}</p>${car?careerSummary(car):''}
    <div class="stack">${nx?`<button class="btn" data-lv="${lvIdx+1}">Enfrentar ${nx.n}</button>`:`<button class="btn" data-act="new">${win?'Jogar de novo':'Tentar de novo'}</button>`}
    <button class="btn ghost" data-act="endclose">Ver o tabuleiro revelado</button><button class="btn ghost" data-act="camp">Campanha</button></div></div>`;
   $('endscr').classList.add('on');$('endscr').scrollTop=0;
@@ -983,7 +1235,7 @@ function render(){
     const i=r*10+c;
     if(isLake(r,c)){h+='<div class="c lake"></div>';continue}
     const p=board[r][c],zone=phase==='setup'&&r>=6;
-    const cls='c'+(aiming&&p&&p.side==='a'?' aim':'')+(tg.has(i)?' tgt':'')+(atk.has(i)?' atk':'')+(L.has(i)?' last':'')+(zone?' zone':'')+(zone&&!p&&selType?' empty':'');
+    const cls='c'+((aiming&&p&&p.side==='a')||(strike==='arty'&&p&&p.side==='a'&&p.k!=='F')||(strike==='plane'&&p&&p.side==='a'&&p.k!=='F'&&rowTargets('a',r).length)?' aim':'')+(tg.has(i)?' tgt':'')+(atk.has(i)?' atk':'')+(L.has(i)?' last':'')+(zone?' zone':'')+(zone&&!p&&selType?' empty':'');
     let inner='',al='casa vazia';
     if(p){
       const sh=p.side==='p'||phase==='over',isSel=(sel&&sel[0]===r&&sel[1]===c)||(aiming&&aiming[0]===r&&aiming[1]===c);
@@ -1011,9 +1263,9 @@ function render(){
       `<button class="btn ghost sm" data-act="clear"${placed()?'':' disabled'}>Limpar</button>`+
       `<button class="btn wide" data-act="go"${placed()===TOTAL?'':' disabled'}>Começar batalha</button>`;
   }else{
-    renderKills();
+    renderKills();renderBonus();
     if(phase==='over'){pill.className='pill o';pill.textContent='Fim'}
-    else if(aiming){pill.className='pill';pill.textContent='Mirando'}
+    else if(aiming||strike){pill.className='pill';pill.textContent='Mirando'}
     else if(busy){pill.className='pill a';pill.textContent='Inimigo'}
     else{pill.className='pill';pill.textContent='Sua vez'}
   }
@@ -1030,7 +1282,7 @@ function killBar(side,el){
 }
 const MIX=[['-','Música'],['music','Trilha sonora'],
  ['-','Ambiente de guerra'],['amb_aviao','Avião passando'],['amb_batalha','Batalha ao longe'],['amb_tanque','Tanque'],['amb_mg','Metralhadora distante'],['amb_canhao','Canhões distantes'],
- ['-','Efeitos do jogo'],['step','Marcha (cartas andando)'],['shot','Tiro de fuzil (confronto)'],['mg','Metralhadora (confronto de oficiais)'],['boom','Explosão (granada)'],['mortar','Morteiro'],['fanfare','Vitória / derrota']];
+ ['-','Efeitos do jogo'],['step','Marcha (cartas andando)'],['shot','Tiro de fuzil (confronto)'],['mg','Metralhadora (confronto de oficiais)'],['boom','Explosão (granada)'],['mortar','Morteiro'],['plane','Avião bombardeiro'],['arty','Artilharia'],['fanfare','Vitória / derrota']];
 function soundSheet(){
   sheet(`<h3>Som</h3><button class="btn ${soundOn?'':'ghost'}" data-act="sound" style="width:100%">${soundOn?'Som ligado':'Som desligado'}</button>
   <div class="mix">${MIX.map(([k,n])=>k==='-'?`<div class="lbl" style="margin:10px 0 0">${n}</div>`:`<label class="mx"><span>${n}<em id="mv_${k}">${Math.round(VOL[k]*100)}%</em></span><input type="range" min="0" max="${k==='music'?100:150}" value="${Math.round(VOL[k]*100)}" data-vol="${k}"></label>`).join('')}</div>
@@ -1039,7 +1291,7 @@ function soundSheet(){
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k)return;VOL[k]=e.target.value/100;store.set('cb_vol',VOL);
   $('mv_'+k).textContent=e.target.value+'%';if(k==='music')setMusicVol(VOL.music);else if(BUS[k])BUS[k].gain.value=VOL[k]});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k||!soundOn)return;ensureAudio();
-  ({amb_aviao:()=>play('amb_aviao','amb_aviao',{dur:4,fadeIn:.8,fadeOut:1.5}),amb_batalha:()=>play('amb_batalha','amb_batalha',{dur:4,fadeIn:.5,fadeOut:1}),amb_tanque:()=>play('amb_tanque','amb_tanque',{dur:3,fadeOut:1}),amb_mg:()=>play('metralhadora','amb_mg',{vol:.4,lp:1400,dur:2}),amb_canhao:()=>play('canhao1','amb_canhao',{vol:.5,lp:900}),mg:()=>play('metralhadora','mg',{dur:1.6,fadeOut:.4}),step:sfxStep,shot:()=>has('tiro')?play('tiro','shot'):sfxShot(0),boom:()=>has('explosao')?play('explosao','boom'):sfxBoom(),mortar:()=>{if(has('morteiro')){play('morteiro','mortar');play('explosao','mortar',{at:1})}else{sfxWhistle(.8);setTimeout(()=>mortarBoom(),800)}},fanfare:()=>sfxFanfare(true)})[k]?.()});
+  ({plane:()=>play('amb_aviao','plane',{dur:2.5,fadeIn:.3,fadeOut:.8}),arty:()=>{play('canhao2','arty');play('explosao','arty',{at:.9})},amb_aviao:()=>play('amb_aviao','amb_aviao',{dur:4,fadeIn:.8,fadeOut:1.5}),amb_batalha:()=>play('amb_batalha','amb_batalha',{dur:4,fadeIn:.5,fadeOut:1}),amb_tanque:()=>play('amb_tanque','amb_tanque',{dur:3,fadeOut:1}),amb_mg:()=>play('metralhadora','amb_mg',{vol:.4,lp:1400,dur:2}),amb_canhao:()=>play('canhao1','amb_canhao',{vol:.5,lp:900}),mg:()=>play('metralhadora','mg',{dur:1.6,fadeOut:.4}),step:sfxStep,shot:()=>has('tiro')?play('tiro','shot'):sfxShot(0),boom:()=>has('explosao')?play('explosao','boom'):sfxBoom(),mortar:()=>{if(has('morteiro')){play('morteiro','mortar');play('explosao','mortar',{at:1})}else{sfxWhistle(.8);setTimeout(()=>mortarBoom(),800)}},fanfare:()=>sfxFanfare(true)})[k]?.()});
 function natSheet(){
   sheet(`<h3>Escolha seu exército</h3><div class="natgrid">${Object.keys(NATIONS).map(k=>`<button data-nat="${k}" class="${k===NAT?'cur':''}" aria-label="${NATIONS[k].n}"><img src="nac/${k}.webp" alt=""></button>`).join('')}</div><button class="btn ghost" data-act="close" style="width:100%;margin-top:14px">Fechar</button>`);
 }
@@ -1055,7 +1307,7 @@ function tropasSheet(){
 const DESC={'10':'O mais forte','3':'Desarma bombas','2':'Anda 1 casa, como todos','1':'Derruba o Marechal se atacar','B':'Destrói quem ataca; não se move','M':'Dispara 1 vez e destrói qualquer carta inimiga, até a bandeira','F':'Não se move'};
 const RULES=()=>`<h3>Como jogar</h3>
 <p>Capture a bandeira inimiga, ou deixe o adversário sem cartas que possam se mover. Suas cartas têm selo vermelho; as do inimigo, verde, com a bandeira do país no verso.</p>
-<ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
+<ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Derrube o General inimigo e ganhe um <b>avião bombardeiro</b>: ele passa por uma fileira e derruba uma carta. Derrube o Marechal e ganhe a <b>artilharia</b>: atinge a carta escolhida e uma vizinha. Nenhum dos dois atinge a bandeira.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
 <div class="grid2">${ORDER.map(k=>`<div>${tok(k,'p',true)}<span><b>${INFO[k].n}</b> ×${INITC[k]}<br><span style="color:var(--mute);font-size:13px">${DESC[k]||'Patente '+k}</span></span></div>`).join('')}</div>
 <button class="btn" data-act="close" style="width:100%;margin-top:8px">Entendi</button>`;
 function menuSheet(){
@@ -1068,7 +1320,7 @@ function menuSheet(){
 }
 
 /* ---------- eventos ---------- */
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(aiming){aiming=null;say('Disparo cancelado.')}sel=null;if($('sheet').classList.contains('on'))closeSheet();render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(aiming||strike){aiming=null;strike=null;say('Disparo cancelado.')}sel=null;if($('sheet').classList.contains('on'))closeSheet();render()}});
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.c');if(!b||b.dataset.i==null)return;const i=+b.dataset.i,r=i/10|0,c=i%10;
   if(phase==='setup')tapSetup(r,c);else tapPlay(r,c)});
 $('tray').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.dataset.k;if(!tray[k])return;selType=selType===k?null:k;sel=null;render()});
@@ -1084,6 +1336,12 @@ document.addEventListener('click',e=>{
   else if(a==='camp'){closeSheet();campaign()}
   else if(a==='menu')menuSheet();
   else if(a==='nat')natSheet();
+  else if(a==='plus'){PLUS=!PLUS;store.set('cb_plus',PLUS);campaign()}
+  else if(a==='quartel')quartelSheet();
+  else if(a==='ficha'){const sid=b.dataset.sid;const sd=findSoldier(sid);if(sd)fichaSheet(sd.s,sd.nat)}
+  else if(a==='selficha'&&sel){const p=board[sel[0]][sel[1]];if(p&&p.sid!=null){const sd=findSoldier(p.sid);if(sd)fichaSheet(sd.s,sd.nat)}}
+  else if(a==='useplane'){if(!busy&&bonus.p.plane){strike='plane';aiming=null;sel=null;say('<b>Bombardeiro pronto!</b> Toque numa fileira com cartas inimigas: o avião passa e derruba uma delas.');render()}}
+  else if(a==='usearty'){if(!busy&&bonus.p.arty){strike='arty';aiming=null;sel=null;say('<b>Artilharia pronta!</b> Toque numa carta inimiga: ela e uma vizinha serão atingidas.');render()}}
   else if(a==='sound'){if(b.closest('#sh'))setSound(!soundOn),soundSheet();else soundSheet()}
   else if(a==='volreset'){Object.assign(VOL,VOLDEF);store.set('cb_vol',VOL);for(const k in BUS)BUS[k].gain.value=VOL[k];setMusicVol(VOL.music);soundSheet()}
   else if(a==='tropas')tropasSheet();
