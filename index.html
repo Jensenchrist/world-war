@@ -879,7 +879,7 @@ function tapPlay(r,c){
   const p=board[r][c];
   if(strike){
     if(strike==='plane'){if(rowTargets('a',r).length)return playerStrike('plane',r,c);}
-    else if(p&&p.side==='a'&&p.k!=='F')return playerStrike('arty',r,c);
+    else if(p&&p.side==='a')return playerStrike('arty',r,c);
     strike=null;say('Ataque cancelado.');render();return;
   }
   if(aiming){
@@ -979,7 +979,14 @@ function onKill(killer,victim){
   if(PLUS)careerKill(killer,victim);
   return t;
 }
-const rowTargets=(side,r)=>{const o=[];for(let c=0;c<COLS;c++){const p=board[r][c];if(p&&p.side===side&&p.k!=='F')o.push([r,c])}return o};
+const rowTargets=(side,r)=>{const o=[];for(let c=0;c<COLS;c++){const p=board[r][c];if(p&&p.side===side)o.push([r,c])}return o};
+// se o alvo cair na bandeira, ela troca em segredo com uma carta vizinha, que recebe o golpe
+function shieldFlag(r,c){const t=board[r][c];if(!t||t.k!=='F')return;
+  const near=[],any=[];
+  for(let rr=0;rr<ROWS;rr++)for(let cc=0;cc<COLS;cc++){const q=board[rr][cc];if(!q||q.side!==t.side||q.k==='F')continue;
+    (Math.max(Math.abs(rr-r),Math.abs(cc-c))===1?near:any).push([rr,cc])}
+  const pool=near.length?near:any;if(!pool.length)return;
+  const [rr,cc]=pool[Math.random()*pool.length|0];board[r][c]=board[rr][cc];board[rr][cc]=t;}
 function renderBonus(){
   const b=bonus.p,el=$('bonus');if(!el)return;
   el.innerHTML=(b.plane?`<button class="bon" data-act="useplane">${PLANE_SVG}<span>Avião${b.plane>1?' ×'+b.plane:''}</span></button>`:'')+
@@ -1015,7 +1022,7 @@ async function planeRun(side,r){
   const sh=document.createElement('div');sh.className='planeshadow'+(side==='a'?' en':'');sh.innerHTML='<img src="aviao.webp" alt="">';sh.style.top=(y+cw*.9)+'px';g.appendChild(sh);
   if(has('amb_aviao'))play('amb_aviao','plane',{dur:3,fadeIn:.4,fadeOut:1,vol:1,offset:8});
   const x0=side==='p'?-cw*3:g.clientWidth+cw*3,x1=side==='p'?g.clientWidth+cw*3:-cw*3,dur=2600;
-  const tg=rowTargets(opp,r),pick=tg[Math.random()*tg.length|0];let txt='';
+  const tg=rowTargets(opp,r),pick=tg[Math.random()*tg.length|0];if(pick)shieldFlag(...pick);let txt='';
   const drop=(px,py)=>{const bm=document.createElement('div');bm.className='bomb';bm.style.left=px+'px';bm.style.top=py+'px';g.appendChild(bm);
     bm.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:'translate(-50%,-50%) scale(.35)',opacity:1}],{duration:520,easing:'ease-in'}).onfinish=()=>bm.remove()};
   await new Promise(res=>{const t0=performance.now();let dropped=false,lt=0;(function f(now){const p=Math.min(1,(now-t0)/dur),x=x0+(x1-x0)*p,bank=Math.sin(p*Math.PI*2)*3;
@@ -1031,10 +1038,10 @@ async function artyRun(side,r,c){
   const opp=side==='p'?'a':'p';
   if(has('canhao2'))play('canhao2','arty',{vol:.9});
   await wait(500);sfxWhistle(.7);await wait(700);
-  blastFx(r,c,'arty');await wait(650);
+  shieldFlag(r,c);blastFx(r,c,'arty');await wait(650);
   let txt=killAt(r,c,side,side==='p'?'Sua artilharia':'A artilharia inimiga');render();
-  const nb=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const rr=r+dr,cc=c+dc;if(inB(rr,cc)&&board[rr][cc]&&board[rr][cc].side===opp&&board[rr][cc].k!=='F')nb.push([rr,cc])}
-  if(nb.length){const [rr,cc]=nb[Math.random()*nb.length|0];if(has('canhao4'))play('canhao4','arty',{vol:.7});await wait(450);blastFx(rr,cc,'arty');await wait(650);txt+=' '+killAt(rr,cc,side,'O segundo disparo');render()}
+  const nb=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const rr=r+dr,cc=c+dc;if(inB(rr,cc)&&board[rr][cc]&&board[rr][cc].side===opp)nb.push([rr,cc])}
+  if(nb.length){const [rr,cc]=nb[Math.random()*nb.length|0];shieldFlag(rr,cc);if(has('canhao4'))play('canhao4','arty',{vol:.7});await wait(450);blastFx(rr,cc,'arty');await wait(650);txt+=' '+killAt(rr,cc,side,'O segundo disparo');render()}
   return txt;
 }
 async function playerStrike(type,r,c){
@@ -1046,7 +1053,7 @@ async function playerStrike(type,r,c){
   await wait(900);await aiTurnRun(txt+' ');
 }
 function aiStrike(){
-  if(bonus.a.arty){let best=null,bv=-1;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=board[r][c];if(!p||p.side!=='p'||p.k==='F')continue;const v=(known(p)?V(p.k):2)+(p.moved?1:0)+Math.random();if(v>bv){bv=v;best=[r,c]}}if(best)return['arty',...best]}
+  if(bonus.a.arty){let best=null,bv=-1;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=board[r][c];if(!p||p.side!=='p')continue;const v=(known(p)?V(p.k):2)+(p.moved?1:0)+Math.random();if(v>bv){bv=v;best=[r,c]}}if(best)return['arty',...best]}
   if(bonus.a.plane){let best=null,bv=-1;for(let r=0;r<ROWS;r++){const t=rowTargets('p',r);if(!t.length)continue;let v=0;for(const [rr,cc] of t){const p=board[rr][cc];v+=known(p)?V(p.k):3}v+=Math.random();if(v>bv){bv=v;best=r}}if(best!=null)return['plane',best,0]}
   return null;
 }
@@ -1304,7 +1311,7 @@ function render(){
     const i=r*10+c;
     if(isLake(r,c)){h+='<div class="c lake"></div>';continue}
     const p=board[r][c],zone=phase==='setup'&&r>=6;
-    const cls='c'+((aiming&&p&&p.side==='a')||(strike==='arty'&&p&&p.side==='a'&&p.k!=='F')||(strike==='plane'&&p&&p.side==='a'&&p.k!=='F'&&rowTargets('a',r).length)?' aim':'')+(tg.has(i)?' tgt':'')+(atk.has(i)?' atk':'')+(L.has(i)?' last':'')+(zone?' zone':'')+(zone&&!p&&selType?' empty':'');
+    const cls='c'+((aiming&&p&&p.side==='a')?' aim':'')+(tg.has(i)?' tgt':'')+(atk.has(i)?' atk':'')+(L.has(i)?' last':'')+(zone?' zone':'')+(zone&&!p&&selType?' empty':'');
     let inner='',al='casa vazia';
     if(p){
       const sh=p.side==='p'||phase==='over',isSel=(sel&&sel[0]===r&&sel[1]===c)||(aiming&&aiming[0]===r&&aiming[1]===c);
@@ -1376,7 +1383,7 @@ function tropasSheet(){
 const DESC={'10':'O mais forte','3':'Desarma bombas','2':'Anda 1 casa, como todos','1':'Derruba o Marechal se atacar','B':'Destrói quem ataca; não se move','M':'Dispara 1 vez e destrói qualquer carta inimiga, até a bandeira','F':'Não se move'};
 const RULES=()=>`<h3>Como jogar</h3>
 <p>Capture a bandeira inimiga, ou deixe o adversário sem cartas que possam se mover. Suas cartas têm selo vermelho; as do inimigo, verde, com a bandeira do país no verso.</p>
-<ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Derrube o General inimigo e ganhe um <b>avião bombardeiro</b>: ele passa por uma fileira e derruba uma carta. Derrube o Marechal e ganhe a <b>artilharia</b>: atinge a carta escolhida e uma vizinha. Nenhum dos dois atinge a bandeira.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
+<ul><li>Cada lado tem ${TOTAL} cartas, escondidas do adversário.</li><li>Cartas andam 1 casa na horizontal ou vertical, nunca pelos lagos.</li><li>No ataque, as duas cartas são reveladas e a de maior patente vence. Empate elimina as duas.</li><li>Ninguém pode ir e voltar entre as mesmas duas casas mais de três vezes seguidas.</li><li>Derrube o General inimigo e ganhe um <b>avião bombardeiro</b>: ele passa por uma fileira e derruba uma carta. Derrube o Marechal e ganhe a <b>artilharia</b>: atinge a carta escolhida e uma vizinha. Se o golpe cair na bandeira, ela troca de lugar em segredo com uma carta vizinha, que é atingida no lugar dela.</li><li>Depois de cada confronto as cartas viram de novo. Memorize o que viu!</li><li>O ponto dourado marca as suas cartas que o inimigo ainda lembra.</li><li>Na campanha, cada exército lembra por mais tempo e erra menos. Os mais difíceis são China, Japão, Alemanha e Rússia.</li></ul>
 <div class="grid2">${ORDER.map(k=>`<div>${tok(k,'p',true)}<span><b>${INFO[k].n}</b> ×${INITC[k]}<br><span style="color:var(--mute);font-size:13px">${DESC[k]||'Patente '+k}</span></span></div>`).join('')}</div>
 <button class="btn" data-act="close" style="width:100%;margin-top:8px">Entendi</button>`;
 function menuSheet(){
